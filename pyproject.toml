@@ -1,0 +1,11 @@
+[project]
+name = "up-actual"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pyright==1.1.390",
+    "pytest~=8.0",
+    "ruff~=0.8",
+]
