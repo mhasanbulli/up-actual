@@ -20,6 +20,7 @@ clean:
 ## create venv and install this package and hooks
 install: $(venv) install-hooks
 	uv sync
+	touch $(venv)
 
 ## run pre-commit git hooks on all files
 hooks: $(venv)
