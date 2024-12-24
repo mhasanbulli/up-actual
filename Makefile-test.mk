@@ -7,9 +7,9 @@ format: export SKIP=pyright,test
 format: hooks
 
 ## pyright type check
-pyright: $(venv)
+pyright: 
 	uv run pyright
 
 ## run tests
-test: $(venv)
-	uv run pytest
+test:
+	PYTHONPATH=$(PYTHONPATH) uv run pytest
