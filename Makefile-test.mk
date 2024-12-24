@@ -11,5 +11,5 @@ pyright: $(venv)
 	uv run pyright
 
 ## run tests
-test: $(venv)
-	uv run pytest
+test: $(venv) 
+	PYTHONPATH=$(PYTHONPATH) uv run pytest
