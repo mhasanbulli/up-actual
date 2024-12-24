@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "actualpy~=0.8",
+    "pre-commit~=4.0",
     "pydantic~=2.0",
 ]
 
@@ -17,7 +18,7 @@ dev = [
 ]
 
 [tool.pyright]
-include = ["tests"]
+include = ["up", "tests"]
 strictListInference = true
 strictDictionaryInference = true
 strictParameterNoneValue = true
@@ -28,6 +29,7 @@ reportMatchNotExhaustive = true
 reportUnnecessaryTypeIgnoreComment = true
 
 [tool.ruff]
+src = ["up"]
 line-length = 120
 fix = true
 show-fixes = true
