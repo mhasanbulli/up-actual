@@ -1,7 +1,7 @@
 import os
 
 
-def get_token():
+def get_token() -> str:
     up_token = os.getenv("UP_TOKEN")
 
     if up_token is None:

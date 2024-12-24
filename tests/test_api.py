@@ -1,11 +1,12 @@
 from unittest.mock import patch
 
+from pytest import MonkeyPatch
 from up.api import UpAPI
 
 
-def test_ping(monkeypatch):
+def test_ping(monkeypatch: MonkeyPatch):
     monkeypatch.setenv("UP_TOKEN", "test_token")
-    
+
     ping_endpoint = UpAPI(endpoint="ping")
     mock_response = {"meta": {"id": "3b5d17a4-6778-48dc-ae7d-9f8aace2e2fc", "statusEmoji": "⚡️"}}
 

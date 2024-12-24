@@ -10,24 +10,21 @@ help:
 
 venv ?= .venv
 
-$(venv): pyproject.toml
-	uv venv
-	touch $(venv)
-
 # delete the venv
 clean:
 	rm -rf $(venv)
 
 ## create venv and install this package and hooks
-install: $(venv) install-hooks
+install: install-hooks
 	uv sync
 	touch $(venv)
 
-## run pre-commit git hooks on all files
-hooks: $(venv)
-	uvx pre-commit run --color=always --all-files --hook-stage push
 
 install-hooks: .git/hooks/pre-push
 
-.git/hooks/pre-push: $(venv)
-	uvx pre-commit install --install-hooks -t pre-push
+.git/hooks/pre-push:
+	uv run pre-commit install --install-hooks -t pre-push
+
+## run pre-commit git hooks on all files
+hooks:
+	uv run pre-commit run --color=always --all-files --hook-stage push
