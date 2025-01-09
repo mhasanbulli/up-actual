@@ -1,0 +1,7 @@
+services:
+  base-app:
+    build:
+      context: .
+      target: base
+
+
