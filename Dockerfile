@@ -21,8 +21,6 @@ FROM base AS testing
 RUN apt-get update && apt-get install --no-install-recommends -y make curl git
 COPY . ./
 
-# RUN git init . && git add up tests
-
 
 
 

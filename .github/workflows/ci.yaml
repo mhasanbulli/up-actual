@@ -6,8 +6,8 @@ on:
   pull_request:
 
 jobs:
-  uv-python:
-    name: python
+  test-in-docker:
+    name: Test in Docker
     runs-on: ubuntu-latest
 
     steps:
