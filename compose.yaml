@@ -1,7 +1,17 @@
 services:
-  base-app:
+  up:
     build:
       context: .
-      target: base
+      dockerfile: Dockerfile
+      target: app
 
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: testing
+    command:
+      - make
+      - check
+      - test
 
