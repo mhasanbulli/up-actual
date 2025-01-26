@@ -10,8 +10,10 @@ services:
       context: .
       dockerfile: Dockerfile
       target: testing
+    environment:
+      - UP_TOKEN=${UP_TOKEN}
     command:
       - make
       - check
-      - test
+      - test-all
 

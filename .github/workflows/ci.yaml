@@ -15,3 +15,5 @@ jobs:
 
       - name: Run tests in Docker
         run: docker compose run --build --rm test
+        env:
+          UP_TOKEN: ${{ secrets.UP_TOKEN }}

@@ -1,17 +1,10 @@
-from unittest.mock import patch
-
-from pytest import MonkeyPatch
-from up.api import UpAPI
+import pytest
+from up.classes import UpAPI
 
 
-def test_ping(monkeypatch: MonkeyPatch):
-    monkeypatch.setenv("UP_TOKEN", "test_token")
+@pytest.mark.integration
+def test_ping():
+    ping_endpoint = UpAPI(endpoint="util/ping")
+    response = ping_endpoint.get_endpoint_response()
 
-    ping_endpoint = UpAPI(endpoint="ping")
-    mock_response = {"meta": {"id": "3b5d17a4-6778-48dc-ae7d-9f8aace2e2fc", "statusEmoji": "⚡️"}}
-
-    with patch.object(ping_endpoint, "get_endpoint_response", return_value=mock_response) as mock_get:
-        response = ping_endpoint.get_endpoint_response()
-
-        mock_get.assert_called_once_with()
-        assert response == mock_response
+    assert response.status_code == 200
