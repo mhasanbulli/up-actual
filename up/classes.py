@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 import requests
+from requests import Response
 
 from up.utils import get_token
 
@@ -20,11 +21,11 @@ class UpAPI:
     def get_url(self) -> str:
         return f"{self.up_api_url}/{self.endpoint}"
 
-    def get_endpoint_response(self) -> dict:
+    def get_endpoint_response(self) -> Response:
         """
         For a given `endpoint`, it returns the response from the Up API.
         """
         url = self.get_url()
         response = requests.get(url=url, headers=self.headers, timeout=1)
 
-        return response.json()
+        return response

@@ -13,5 +13,5 @@ services:
     command:
       - make
       - check
-      - test
+      - test-all
 
