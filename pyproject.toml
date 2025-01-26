@@ -6,8 +6,10 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "actualpy~=0.8",
+    "jsonschema~=4.0",
     "pre-commit~=4.0",
     "pydantic~=2.0",
+    "structlog~=25.0",
 ]
 
 [dependency-groups]
@@ -68,3 +70,8 @@ force-wrap-aliases = true
 [tool.ruff.lint.flake8-annotations]
 # allow *args: Any, **kwargs: Any
 allow-star-arg-any = true
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: marks tests as integration (deselect with '-m \"not integration\"')",
+]
