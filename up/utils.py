@@ -4,7 +4,7 @@ from pathlib import Path
 
 from jsonschema import ValidationError, validate
 
-from up.logging import logger
+from up.logger import logger
 
 
 def get_token() -> str:
