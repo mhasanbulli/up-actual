@@ -74,4 +74,5 @@ allow-star-arg-any = true
 [tool.pytest.ini_options]
 markers = [
     "integration: marks tests as integration (deselect with '-m \"not integration\"')",
+    "schema: marks tests that validates schema of a given endpoint (deselect with '-m \"not schema\"')"
 ]
