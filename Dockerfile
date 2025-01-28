@@ -12,7 +12,12 @@ FROM base AS app
 RUN apt-get update && apt-get install cron -y
 COPY . ./
 
-RUN crontab crontab
+COPY ./crontab /etc/cron.d/
+RUN chmod 0644 /etc/cron.d/crontab
+
+RUN crontab /etc/cron.d/crontab
+
+RUN touch /var/log/cron.log
 
 CMD ["cron", "-f"]
 
