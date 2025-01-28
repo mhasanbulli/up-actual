@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
       target: app
+    environment:
+      - UP_TOKEN=${UP_TOKEN}
 
   test:
     build:

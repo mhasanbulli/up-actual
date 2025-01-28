@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from up.classes import UpAPI
-from up.logging import logger
+from up.logger import logger
 from up.utils import load_json, schema_validator
 
 logger.info("Starting up...")
