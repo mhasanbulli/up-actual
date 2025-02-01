@@ -12,7 +12,7 @@ pyright:
 
 ## run tests
 test:
-	PYTHONPATH=$(PYTHONPATH) uv run pytest -m "not integration"
+	PYTHONPATH=$(PYTHONPATH) uv run pytest -m "not schema"
 
 test-all:
 	PYTHONPATH=$(PYTHONPATH) uv run pytest
