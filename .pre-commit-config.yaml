@@ -2,11 +2,11 @@
 default_stages: [pre-push]
 repos:
   - repo: https://github.com/crate-ci/typos
-    rev: v1.28.4
+    rev: v1.29.5
     hooks:
       - id: typos
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.5.8
+    rev: 0.5.26
     hooks:
       - id: uv-lock
   # formatters and linters are available in the virtualenv so they can be run from the makefile & vscode

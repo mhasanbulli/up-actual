@@ -31,7 +31,7 @@
                 "type": "string"
               },
               "message": {
-                "type": "string"
+                "type": ["string", "null"]
               },
               "isCategorizable": {
                 "type": "boolean"
@@ -210,7 +210,7 @@
                 }
               },
               "performingCustomer": {
-                "type": "object",
+                "type": ["object", "null"],
                 "properties": {
                   "displayName": {
                     "type": "string"
