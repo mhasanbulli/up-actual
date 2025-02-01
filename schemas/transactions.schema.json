@@ -1,0 +1,457 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "accounts",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string"
+              },
+              "rawText": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "description": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "isCategorizable": {
+                "type": "boolean"
+              },
+              "holdInfo": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "amount": {
+                    "type": "object",
+                    "properties": {
+                      "currencyCode": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      },
+                      "valueInBaseUnits": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "foreignAmount": {
+                    "type": "object",
+                    "properties": {
+                      "currencyCode": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      },
+                      "valueInBaseUnits": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              },
+              "roundUp": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "amount": {
+                    "type": "object",
+                    "properties": {
+                      "currencyCode": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      },
+                      "valueInBaseUnits": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "boostPortion": {
+                    "type": "object",
+                    "properties": {
+                      "currencyCode": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      },
+                      "valueInBaseUnits": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              },
+              "cashback": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "object",
+                    "properties": {
+                      "currencyCode": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      },
+                      "valueInBaseUnits": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              },
+              "amount": {
+                "type": "object",
+                "properties": {
+                  "currencyCode": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  },
+                  "valueInBaseUnits": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "foreignAmount": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "currencyCode": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  },
+                  "valueInBaseUnits": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "cardPurchaseMethod": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "method": {
+                    "type": "string"
+                  },
+                  "cardNumberSuffix": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              },
+              "settledAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "transactionType": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  }
+                }
+              },
+              "performingCustomer": {
+                "type": "object",
+                "properties": {
+                  "displayName": {
+                    "type": "string"
+                  }
+                }
+              },
+              "deepLinkURL": {
+                "type": "string"
+              }
+            }
+          },
+          "relationships": {
+            "type": "object",
+            "properties": {
+              "account": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    }
+                  },
+                  "links": {
+                    "type": "object",
+                    "properties": {
+                      "related": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              },
+              "transferAccount": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "uuid"
+                      }
+                    }
+                  },
+                  "links": {
+                    "type": "object",
+                    "properties": {
+                      "related": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              },
+              "category": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    }
+                  },
+                  "links": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "properties": {
+                      "related": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              },
+              "parentCategory": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "data": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    }
+                  },
+                  "links": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "properties": {
+                      "related": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              },
+              "tags": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      }
+                    }
+                  },
+                  "links": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "properties": {
+                      "self": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              },
+              "attachment": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    }
+                  },
+                  "links": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "properties": {
+                      "related": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "links": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "self": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          }
+        }
+      }
+    },
+    "links": {
+      "type": "object",
+      "properties": {
+        "prev": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        },
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        }
+      }
+    }
+  }
+}
