@@ -20,23 +20,25 @@ class UpAPI:
         return {"Authorization": f"Bearer {get_token()}"}
 
     def get_url(self, url_params: dict | None = None) -> str | bytes:
-        if url_params is None or not self.endpoint:
+        if url_params is None and not self.endpoint:
             return self.up_api_url
 
         base_url = f"{self.up_api_url}/{self.endpoint}"
 
         params = {}
 
-        for key, value in url_params.items():
-            if isinstance(value, list):
-                for item in value:
-                    params[key] = item
-            elif value is not None:
-                params[key] = value
+        if url_params is not None:
+            for key, value in url_params.items():
+                if isinstance(value, list):
+                    for item in value:
+                        params[key] = item
+                elif value is not None:
+                    params[key] = value
 
         encoded_params = urlencode(params)
+        url = "?" + encoded_params if encoded_params != "" else ""
 
-        return urljoin(base=base_url, url="?" + encoded_params)
+        return urljoin(base=base_url, url=url)
 
     def get_endpoint_response(self, url_params: dict | None = None) -> Response:
         """
