@@ -1,16 +1,13 @@
 from dataclasses import dataclass
-from urllib.parse import urlencode, urljoin
 
 import requests
 from requests import Response
 
-from up.utils import get_token
+from up.utils import get_rfc_3339_date, get_token, get_url
 
 
 @dataclass
 class UpAPI:
-    endpoint: str
-
     @property
     def up_api_url(self) -> str:
         return "https://api.up.com.au/api/v1"
@@ -19,32 +16,46 @@ class UpAPI:
     def headers(self) -> dict:
         return {"Authorization": f"Bearer {get_token()}"}
 
-    def get_url(self, url_params: dict | None = None) -> str | bytes:
-        if url_params is None and not self.endpoint:
-            return self.up_api_url
+    @property
+    def accounts_url(self) -> str:
+        return f"{self.up_api_url}/accounts"
 
-        base_url = f"{self.up_api_url}/{self.endpoint}"
+    @property
+    def ping_url(self) -> str:
+        return f"{self.up_api_url}/util/ping"
 
-        params = {}
+    @property
+    def transactions_url(self) -> str:
+        return f"{self.up_api_url}/transactions"
 
-        if url_params is not None:
-            for key, value in url_params.items():
-                if isinstance(value, list):
-                    for item in value:
-                        params[key] = item
-                elif value is not None:
-                    params[key] = value
-
-        encoded_params = urlencode(params)
-        url = "?" + encoded_params if encoded_params != "" else ""
-
-        return urljoin(base=base_url, url=url)
-
-    def get_endpoint_response(self, url_params: dict | None = None) -> Response:
-        """
-        For a given `endpoint`, it returns the response from the Up API.
-        """
-        url = self.get_url(url_params)
+    def get_endpoint_response(self, url: str, url_params: dict | None = None) -> Response:
+        url = get_url(url, url_params)
         response = requests.get(url=url, headers=self.headers, timeout=1)
 
         return response
+
+
+@dataclass
+class UpAccount:
+    name: str
+    url: str
+
+
+@dataclass
+class AccountTransactions:
+    account_name: str
+    transactions: list
+
+
+@dataclass
+class QueryParams:
+    page_size: int = 10
+    status: str = "SETTLED"
+    days: int = 2
+
+    def get_params(self) -> dict:
+        return {
+            "page[size]": self.page_size,
+            "filter[status]": self.status,
+            "filter[since]": get_rfc_3339_date(self.days),
+        }
