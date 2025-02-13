@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import requests
 from requests import Response
 
-from up.utils import get_token, get_url
+from up.utils import get_rfc_3339_date, get_token, get_url
 
 
 @dataclass
@@ -33,3 +33,29 @@ class UpAPI:
         response = requests.get(url=url, headers=self.headers, timeout=1)
 
         return response
+
+
+@dataclass
+class UpAccount:
+    name: str
+    url: str
+
+
+@dataclass
+class AccountTransactions:
+    account_name: str
+    transactions: list
+
+
+@dataclass
+class QueryParams:
+    page_size: int = 10
+    status: str = "SETTLED"
+    days: int = 2
+
+    def get_params(self) -> dict:
+        return {
+            "page[size]": self.page_size,
+            "filter[status]": self.status,
+            "filter[since]": get_rfc_3339_date(self.days),
+        }
