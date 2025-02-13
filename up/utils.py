@@ -1,7 +1,10 @@
 import json
 import os
+from datetime import datetime, timedelta
 from pathlib import Path
+from urllib.parse import urlencode, urljoin
 
+import pytz
 from jsonschema import ValidationError, validate
 
 from up.logger import logger
@@ -26,3 +29,25 @@ def schema_validator(instance: dict, schema: dict) -> None:
         logger.info("Validation passed \u2728")
     except ValidationError as e:
         raise ValidationError(f"Validation error: {e}") from e
+
+
+def get_url(base_url: str, url_params: dict | None = None) -> str:
+    params = {}
+
+    if url_params is not None:
+        for key, value in url_params.items():
+            if isinstance(value, list):
+                for item in value:
+                    params[key] = item
+            elif value is not None:
+                params[key] = value
+
+    encoded_params = urlencode(params)
+    url = "?" + encoded_params if encoded_params != "" else ""
+
+    return urljoin(base=base_url, url=url)
+
+
+def get_rfc_3339_date(days: int) -> str:
+    mel_tz = pytz.timezone("Australia/Melbourne")
+    return (datetime.now(mel_tz) - timedelta(days=days)).isoformat()
