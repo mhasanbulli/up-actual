@@ -5,17 +5,18 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "actualpy~=0.8",
+    "actualpy~=0.10",
     "jsonschema~=4.0",
     "pre-commit~=4.0",
     "pydantic~=2.0",
+    "pydantic-settings~=2.0",
     "pytz~=2025.0",
     "structlog~=25.0",
 ]
 
 [dependency-groups]
 dev = [
-    "pyright~=1.1.0",
+    "pyright==1.1.394",
     "pytest~=8.0",
     "ruff~=0.9",
 ]

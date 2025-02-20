@@ -1,53 +1,25 @@
-import json
-from json import JSONDecodeError
-
-from requests import RequestException
-
-from up.classes import AccountTransactions, QueryParams, UpAccount, UpAPI
+from up.app_config import Settings
+from up.classes import ActualSession, QueryParams, UpAPI
 from up.logger import logger
-
-up_api = UpAPI()
-query_params = QueryParams()
+from up.transactions import get_account_transaction_urls, get_transactions, reconcile_transactions
 
 logger.info("Starting up...")
 
+up_api = UpAPI()
+query_params = QueryParams()
+actual_settings = Settings()  # type: ignore
 
-def get_account_transaction_urls() -> list[UpAccount]:
-    logger.info("Getting accounts...")
+actual_session = ActualSession(
+    url=actual_settings.url.get_secret_value(),
+    password=actual_settings.password.get_secret_value(),
+    file=actual_settings.file,
+    encryption_password=actual_settings.encryption_password.get_secret_value(),
+)
 
-    url_accounts = up_api.accounts_url
-    response = up_api.get_endpoint_response(url_accounts)
-    response_json = json.loads(response.text)
-
-    return [
-        UpAccount(
-            name=account["attributes"]["displayName"], url=account["relationships"]["transactions"]["links"]["related"]
-        )
-        for account in response_json["data"]
-    ]
-
-
-def get_transactions(account: UpAccount) -> AccountTransactions:
-    transactions = []
-    next_url = account.url
-    url_params = query_params.get_params()
-
-    try:
-        while next_url:
-            response = up_api.get_endpoint_response(url=next_url, url_params=url_params)
-            response_json = json.loads(response.text)
-
-            transactions.extend(response_json["data"])
-            next_url = response_json.get("links", {}).get("next")
-
-    except (RequestException, JSONDecodeError, KeyError) as e:
-        logger.error(f"Error fetching transactions: {e!s}")
-        raise
-
-    return AccountTransactions(account_name=account.name, transactions=transactions)
-
+actual = actual_session.get_actual_session()
 
 if __name__ == "__main__":
     up_accounts = get_account_transaction_urls()
     for up_account in up_accounts:
         account_transactions = get_transactions(up_account)
+        reconcile_transactions(account_transactions)

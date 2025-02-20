@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 import requests
+from actual import Actual
 from requests import Response
 
 from up.utils import get_rfc_3339_date, get_token, get_url
@@ -59,3 +60,16 @@ class QueryParams:
             "filter[status]": self.status,
             "filter[since]": get_rfc_3339_date(self.days),
         }
+
+
+@dataclass
+class ActualSession:
+    url: str
+    password: str
+    file: str
+    encryption_password: str
+
+    def get_actual_session(self) -> Actual:
+        return Actual(
+            base_url=self.url, password=self.password, file=self.file, encryption_password=self.encryption_password
+        )
