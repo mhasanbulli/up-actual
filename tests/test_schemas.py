@@ -24,6 +24,7 @@ def test_transactions_schema():
     transactions_url = up_api.transactions_url
     url_params = {
         "page[size]": 1,
+        "filter[status]": "SETTLED",
     }
 
     response = up_api.get_endpoint_response(url=transactions_url, url_params=url_params)
