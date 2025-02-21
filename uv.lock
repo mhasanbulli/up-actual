@@ -1,9 +1,10 @@
 version = 1
+revision = 1
 requires-python = ">=3.12"
 
 [[package]]
 name = "actualpy"
-version = "0.8.1"
+version = "0.10.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cryptography" },
@@ -15,9 +16,9 @@ dependencies = [
     { name = "sqlalchemy" },
     { name = "sqlmodel" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b1/18/73f444e285c3b11e53d942506e0677184f333b5b752989e9e82a474b6a70/actualpy-0.8.1.tar.gz", hash = "sha256:3a2d16c1946bfc2c3d8bd7acf8979a263149682fc4719ea0c4876b889247f947", size = 69784 }
+sdist = { url = "https://files.pythonhosted.org/packages/e5/79/2f8e458922381400c5ff2cad8348a730596b842a85b429d91814a45a2f3a/actualpy-0.10.0.tar.gz", hash = "sha256:9c1e3c7ee6825d976906526356d05086cc5b8a3ab8cb67c3e037978a53bbdd46", size = 73920 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e2/51/99d0344f4d8210552641b341c8a6f323a689eddc0f0895f06a5fd96ca9ce/actualpy-0.8.1-py3-none-any.whl", hash = "sha256:0b251f9c246f9c76e53167b68e720e74b46075faddf3bf6b3bf16be254453b94", size = 57871 },
+    { url = "https://files.pythonhosted.org/packages/1e/77/37a40c755f6130ff91f3b9ff39f66eafcf38ddeb2cd0aa936d192a14456c/actualpy-0.10.0-py3-none-any.whl", hash = "sha256:d60007e42b891905a1581a86e387fef10cc721b49543dc4cd09f816f3d9511b9", size = 61509 },
 ]
 
 [[package]]
@@ -410,16 +411,29 @@ wheels = [
 ]
 
 [[package]]
+name = "pydantic-settings"
+version = "2.7.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "python-dotenv" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/73/7b/c58a586cd7d9ac66d2ee4ba60ca2d241fa837c02bca9bea80a9a8c3d22a9/pydantic_settings-2.7.1.tar.gz", hash = "sha256:10c9caad35e64bfb3c2fbf70a078c0e25cc92499782e5200747f942a065dec93", size = 79920 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b4/46/93416fdae86d40879714f72956ac14df9c7b76f7d41a4d68aa9f71a0028b/pydantic_settings-2.7.1-py3-none-any.whl", hash = "sha256:590be9e6e24d06db33a4262829edef682500ef008565a969c73d39d5f8bfb3fd", size = 29718 },
+]
+
+[[package]]
 name = "pyright"
-version = "1.1.393"
+version = "1.1.394"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "nodeenv" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f4/c1/aede6c74e664ab103673e4f1b7fd3d058fef32276be5c43572f4067d4a8e/pyright-1.1.393.tar.gz", hash = "sha256:aeeb7ff4e0364775ef416a80111613f91a05c8e01e58ecfefc370ca0db7aed9c", size = 3790430 }
+sdist = { url = "https://files.pythonhosted.org/packages/b1/e4/79f4d8a342eed6790fdebdb500e95062f319ee3d7d75ae27304ff995ae8c/pyright-1.1.394.tar.gz", hash = "sha256:56f2a3ab88c5214a451eb71d8f2792b7700434f841ea219119ade7f42ca93608", size = 3809348 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/92/47/f0dd0f8afce13d92e406421ecac6df0990daee84335fc36717678577d3e0/pyright-1.1.393-py3-none-any.whl", hash = "sha256:8320629bb7a44ca90944ba599390162bf59307f3d9fb6e27da3b7011b8c17ae5", size = 5646057 },
+    { url = "https://files.pythonhosted.org/packages/d6/4c/50c74e3d589517a9712a61a26143b587dba6285434a17aebf2ce6b82d2c3/pyright-1.1.394-py3-none-any.whl", hash = "sha256:5f74cce0a795a295fb768759bbeeec62561215dea657edcaab48a932b031ddbb", size = 5679540 },
 ]
 
 [[package]]
@@ -447,6 +461,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/66/c0/0c8b6ad9f17a802ee498c46e004a0eb49bc148f2fd230864601a86dcf6db/python-dateutil-2.9.0.post0.tar.gz", hash = "sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3", size = 342432 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ec/57/56b9bcc3c9c6a792fcbaf139543cee77261f3651ca9da0c93f5c1221264b/python_dateutil-2.9.0.post0-py2.py3-none-any.whl", hash = "sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427", size = 229892 },
+]
+
+[[package]]
+name = "python-dotenv"
+version = "1.0.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/bc/57/e84d88dfe0aec03b7a2d4327012c1627ab5f03652216c63d49846d7a6c58/python-dotenv-1.0.1.tar.gz", hash = "sha256:e324ee90a023d808f1959c46bcbc04446a10ced277783dc6ee09987c37ec10ca", size = 39115 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6a/3e/b68c118422ec867fa7ab88444e1274aa40681c606d59ac27de5a5588f082/python_dotenv-1.0.1-py3-none-any.whl", hash = "sha256:f7b63ef50f1b690dddf550d03497b66d609393b40b564ed0d674909a68ebf16a", size = 19863 },
 ]
 
 [[package]]
@@ -663,6 +686,7 @@ dependencies = [
     { name = "jsonschema" },
     { name = "pre-commit" },
     { name = "pydantic" },
+    { name = "pydantic-settings" },
     { name = "pytz" },
     { name = "structlog" },
 ]
@@ -676,17 +700,18 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "actualpy", specifier = "~=0.8" },
+    { name = "actualpy", specifier = "~=0.10" },
     { name = "jsonschema", specifier = "~=4.0" },
     { name = "pre-commit", specifier = "~=4.0" },
     { name = "pydantic", specifier = "~=2.0" },
+    { name = "pydantic-settings", specifier = "~=2.0" },
     { name = "pytz", specifier = "~=2025.0" },
     { name = "structlog", specifier = "~=25.0" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "pyright", specifier = "~=1.1.0" },
+    { name = "pyright", specifier = "==1.1.394" },
     { name = "pytest", specifier = "~=8.0" },
     { name = "ruff", specifier = "~=0.9" },
 ]
