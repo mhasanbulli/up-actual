@@ -1,7 +1,7 @@
-import json
 from pathlib import Path
 
 import pytest
+import ujson
 from up.classes import UpAPI
 from up.utils import load_json, schema_validator
 
@@ -16,7 +16,7 @@ def test_accounts_schema():
     accounts_url = up_api.accounts_url
     response = up_api.get_endpoint_response(accounts_url)
 
-    schema_validator(json.loads(response.text), ACCOUNTS_SCHEMA)
+    schema_validator(ujson.loads(response.text), ACCOUNTS_SCHEMA)
 
 
 @pytest.mark.schema
@@ -29,4 +29,4 @@ def test_transactions_schema():
 
     response = up_api.get_endpoint_response(url=transactions_url, url_params=url_params)
 
-    schema_validator(json.loads(response.text), TRANSACTIONS_SCHEMA)
+    schema_validator(ujson.loads(response.text), TRANSACTIONS_SCHEMA)
