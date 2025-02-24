@@ -12,6 +12,7 @@ dependencies = [
     "pydantic-settings~=2.0",
     "pytz~=2025.0",
     "structlog~=25.0",
+    "ujson~=5.0",
 ]
 
 [dependency-groups]

@@ -1,7 +1,6 @@
 from up.app_config import Settings
 from up.classes import ActualSession, QueryParams, UpAPI
 from up.logger import logger
-from up.transactions import get_account_transaction_urls, get_transactions, reconcile_transactions
 
 logger.info("Starting up...")
 
@@ -19,6 +18,8 @@ actual_session = ActualSession(
 actual = actual_session.get_actual_session()
 
 if __name__ == "__main__":
+    from up.transactions import get_account_transaction_urls, get_transactions, reconcile_transactions
+
     up_accounts = get_account_transaction_urls()
     for up_account in up_accounts:
         account_transactions = get_transactions(up_account)
