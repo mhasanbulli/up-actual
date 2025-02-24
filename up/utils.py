@@ -1,10 +1,10 @@
-import json
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlencode, urljoin
 
 import pytz
+import ujson
 from jsonschema import ValidationError, validate
 
 from up.logger import logger
@@ -20,7 +20,7 @@ def get_token() -> str:
 
 def load_json(file_path: Path) -> dict:
     with file_path.open(mode="r", encoding="utf-8") as file:
-        return json.load(file)
+        return ujson.load(file)
 
 
 def schema_validator(instance: dict, schema: dict) -> None:
