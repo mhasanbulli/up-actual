@@ -3,15 +3,21 @@ from decimal import Decimal
 from json import JSONDecodeError
 
 import ujson
-from actual import reconcile_transaction
+from actual import Actual, reconcile_transaction
 from requests import RequestException
 
-from up.app import actual, query_params, up_api
-from up.classes import AccountTransactions, Categories, SimplifiedCategories, UpAccount
+from up.classes import (
+    AccountBatchTransactions,
+    Categories,
+    QueryParams,
+    SimplifiedCategories,
+    UpAccount,
+    UpAPI,
+)
 from up.logger import logger
 
 
-def get_account_transaction_urls() -> list[UpAccount]:
+def get_account_transaction_urls(up_api: UpAPI) -> list[UpAccount]:
     logger.info("Getting accounts...")
 
     url_accounts = up_api.accounts_url
@@ -26,30 +32,30 @@ def get_account_transaction_urls() -> list[UpAccount]:
     ]
 
 
-def get_transactions(account: UpAccount) -> AccountTransactions:
-    transactions = []
-    next_url = account.url
-    url_params = query_params.get_params()
+def get_transactions_batch(
+    up_api: UpAPI, query_params: QueryParams | None, account_name: str, url: str
+) -> AccountBatchTransactions:
+    url_params = query_params.get_params() if query_params else None
 
     try:
-        while next_url:
-            response = up_api.get_endpoint_response(url=next_url, url_params=url_params)
-            response_json = ujson.loads(response.text)
+        logger.info(f"Fetching transactions for {account_name}...")
 
-            transactions.extend(response_json["data"])
-            next_url = response_json.get("links", {}).get("next")
+        response = up_api.get_endpoint_response(url=url, url_params=url_params)
+        response_json = ujson.loads(response.text)
+        transactions = response_json["data"]
+        next_url = response_json.get("links", {}).get("next")
 
     except (RequestException, JSONDecodeError, KeyError) as e:
         logger.error(f"Error fetching transactions: {e!s}")
         raise
 
-    return AccountTransactions(account_name=account.name, transactions=transactions)
+    return AccountBatchTransactions(account_name=account_name, transactions=transactions, next_url=next_url)
 
 
-def reconcile_transactions(transactions: AccountTransactions) -> None:
+def reconcile_transactions(actual_session: Actual, transactions: AccountBatchTransactions) -> None:
     logger.info(f"Reconciling transactions for {transactions.account_name}...")
 
-    with actual as a:
+    with actual_session as a:
         for transaction in transactions.transactions:
             category_data = transaction.get("relationships", {}).get("category", {}).get("data", {})
             category = Categories(category_data.get("id")) if category_data else None
@@ -65,6 +71,6 @@ def reconcile_transactions(transactions: AccountTransactions) -> None:
                 imported_id=transaction["id"],
                 category=simplified_category,
                 update_existing=True,
-                cleared=True,
+                cleared=bool(transaction["attributes"]["status"] == "SETTLED"),
             )
         a.commit()
