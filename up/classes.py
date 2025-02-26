@@ -1,11 +1,13 @@
-from dataclasses import dataclass
+import datetime
+from dataclasses import dataclass, field
 from enum import Enum, StrEnum
+from typing import Annotated
 
 import requests
 from actual import Actual
 from requests import Response
 
-from up.utils import get_rfc_3339_date, get_token, get_url
+from up.utils import get_rfc_3339_date_offset, get_token, get_url
 
 
 @dataclass
@@ -46,25 +48,26 @@ class UpAPI:
 class UpAccount:
     name: str
     url: str
+    next_url: str | None = None
 
 
 @dataclass
-class AccountTransactions:
+class AccountBatchTransactions:
     account_name: str
     transactions: list
+    next_url: str | None = None
 
 
 @dataclass
 class QueryParams:
-    page_size: int = 10
-    status: str = "SETTLED"
-    days: int = 2
+    start_date: Annotated[datetime.datetime, field(default_factory=datetime.datetime.now)]
+    page_size: int = 100
+    days_offset: int = 1
 
     def get_params(self) -> dict:
         return {
             "page[size]": self.page_size,
-            "filter[status]": self.status,
-            "filter[since]": get_rfc_3339_date(self.days),
+            "filter[since]": get_rfc_3339_date_offset(start_date=self.start_date, days_offset=self.days_offset),
         }
 
 
