@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlencode, urljoin
 
-import pytz
 import ujson
 from jsonschema import ValidationError, validate
 
@@ -48,6 +47,5 @@ def get_url(base_url: str, url_params: dict | None = None) -> str:
     return urljoin(base=base_url, url=url)
 
 
-def get_rfc_3339_date(days: int) -> str:
-    mel_tz = pytz.timezone("Australia/Melbourne")
-    return (datetime.now(mel_tz) - timedelta(days=days)).isoformat()
+def get_rfc_3339_date_offset(start_date: datetime, days_offset: int) -> str:
+    return (start_date - timedelta(days=days_offset)).astimezone().replace(microsecond=0).isoformat()
