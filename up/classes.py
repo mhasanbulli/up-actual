@@ -145,7 +145,6 @@ class SimplifiedCategories(Enum):
             Categories.PETS,
             Categories.LIFE_ADMIN,
             Categories.TOBACCO_VAPING,
-            Categories.TECHNOLOGY,
             Categories.GIFTS_CHARITY,
             Categories.HOME,
             Categories.HOMEWARE_APPLIANCES,
@@ -229,6 +228,12 @@ class SimplifiedCategories(Enum):
         {
             Categories.INVESTMENTS,
             Categories.REPAYMENTS,
+        },
+    )
+    TECHNOLOGY = (
+        "Technology",
+        {
+            Categories.TECHNOLOGY,
         },
     )
 
