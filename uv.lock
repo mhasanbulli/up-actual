@@ -729,7 +729,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "actualpy", specifier = "~=0.10" },
+    { name = "actualpy", specifier = "==0.10.0" },
     { name = "jsonschema", specifier = "~=4.0" },
     { name = "pre-commit", specifier = "~=4.0" },
     { name = "pydantic", specifier = "~=2.0" },
