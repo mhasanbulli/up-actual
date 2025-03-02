@@ -6,6 +6,10 @@ services:
       target: app
     environment:
       - UP_TOKEN=${UP_TOKEN}
+      - ACTUAL__FILE=Mel
+      - ACTUAL__ENCRYPTION_PASSWORD=${ACTUAL__ENCRYPTION_PASSWORD}
+      - ACTUAL__PASSWORD=${ACTUAL__PASSWORD}
+      - ACTUAL__URL=${ACTUAL__URL}
 
   test:
     build:
@@ -18,4 +22,3 @@ services:
       - make
       - check
       - test-all
-

@@ -66,6 +66,7 @@ def reconcile_transactions(actual_session: Actual, transactions: AccountBatchTra
                 date=datetime.fromisoformat(transaction["attributes"]["createdAt"]).date(),
                 account=transactions.account_name,
                 payee=transaction["attributes"]["description"],
+                imported_payee=transaction["attributes"]["rawText"],
                 notes=transaction["attributes"]["message"],
                 amount=Decimal(transaction["attributes"]["amount"]["value"]),
                 imported_id=transaction["id"],
