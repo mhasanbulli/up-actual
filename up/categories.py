@@ -12,6 +12,3 @@ def get_categories() -> list:
     all_categories = [category["id"] for category in response_json["data"]]
 
     return all_categories
-
-
-get_categories()
