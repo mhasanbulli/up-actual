@@ -8,7 +8,7 @@ from up.transactions import get_account_transaction_urls, get_transactions_batch
 logger.info("Starting up...")
 
 up_api = UpAPI()
-query_params = QueryParams(start_date=datetime.datetime(2025, 2, 1), days_offset=0, page_size=100)
+query_params = QueryParams(start_date=datetime.datetime(2025, 3, 1), days_offset=0, page_size=100)
 actual_settings = Settings()  # type: ignore
 
 actual_init = ActualSession(
