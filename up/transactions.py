@@ -4,6 +4,7 @@ from json import JSONDecodeError
 
 import ujson
 from actual import Actual, reconcile_transaction
+from actual.queries import get_ruleset
 from requests import RequestException
 
 from up.classes import (
@@ -56,12 +57,14 @@ def reconcile_transactions(actual_session: Actual, transactions: AccountBatchTra
     logger.info(f"Reconciling transactions for {transactions.account_name}...")
 
     with actual_session as a:
+        rule_set = get_ruleset(a.session)
+
         for transaction in transactions.transactions:
             category_data = transaction.get("relationships", {}).get("category", {}).get("data", {})
             category = Categories(category_data.get("id")) if category_data else None
             simplified_category = SimplifiedCategories.get_simplified_category_label(category_class=category)
 
-            reconcile_transaction(
+            transaction = reconcile_transaction(
                 a.session,
                 date=datetime.fromisoformat(transaction["attributes"]["createdAt"]).date(),
                 account=transactions.account_name,
@@ -74,4 +77,6 @@ def reconcile_transactions(actual_session: Actual, transactions: AccountBatchTra
                 update_existing=True,
                 cleared=bool(transaction["attributes"]["status"] == "SETTLED"),
             )
+            rule_set.run(transaction)
+
         a.commit()
