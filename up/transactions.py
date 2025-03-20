@@ -59,12 +59,13 @@ def reconcile_transactions(actual_session: Actual, transactions: AccountBatchTra
     with actual_session as a:
         rule_set = get_ruleset(a.session)
 
+        already_imported_transactions = []
         for transaction in transactions.transactions:
             category_data = transaction.get("relationships", {}).get("category", {}).get("data", {})
             category = Categories(category_data.get("id")) if category_data else None
             simplified_category = SimplifiedCategories.get_simplified_category_label(category_class=category)
 
-            transaction = reconcile_transaction(
+            reconciled_transaction = reconcile_transaction(
                 a.session,
                 date=datetime.fromisoformat(transaction["attributes"]["createdAt"]).date(),
                 account=transactions.account_name,
@@ -74,9 +75,11 @@ def reconcile_transactions(actual_session: Actual, transactions: AccountBatchTra
                 amount=Decimal(transaction["attributes"]["amount"]["value"]),
                 imported_id=transaction["id"],
                 category=simplified_category,
-                update_existing=True,
                 cleared=bool(transaction["attributes"]["status"] == "SETTLED"),
+                already_matched=already_imported_transactions,
+                update_existing=True,
             )
-            rule_set.run(transaction)
+            already_imported_transactions.append(reconciled_transaction)
 
+        rule_set.run(already_imported_transactions)
         a.commit()
