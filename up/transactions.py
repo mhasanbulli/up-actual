@@ -3,7 +3,7 @@ from decimal import Decimal
 from json import JSONDecodeError
 
 import ujson
-from actual import Actual, reconcile_transaction
+from actual import Actual, get_transactions, reconcile_transaction
 from actual.queries import get_ruleset
 from requests import RequestException
 
@@ -53,13 +53,24 @@ def get_transactions_batch(
     return AccountBatchTransactions(account_name=account_name, transactions=transactions, next_url=next_url)
 
 
-def reconcile_transactions(actual_session: Actual, transactions: AccountBatchTransactions) -> None:
+def reconcile_transactions(
+    actual_session: Actual, transactions: AccountBatchTransactions, start_date: datetime
+) -> None:
     logger.info(f"Reconciling transactions for {transactions.account_name}...")
+
+    already_imported_transactions = []
 
     with actual_session as a:
         rule_set = get_ruleset(a.session)
 
-        already_imported_transactions = []
+        logger.info("Getting transactions from Actual...")
+
+        existing_transactions_from_actual = get_transactions(
+            a.session, account=transactions.account_name, start_date=start_date
+        )
+
+        already_imported_transactions.extend(existing_transactions_from_actual)
+
         for transaction in transactions.transactions:
             category_data = transaction.get("relationships", {}).get("category", {}).get("data", {})
             category = Categories(category_data.get("id")) if category_data else None

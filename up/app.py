@@ -27,7 +27,9 @@ if __name__ == "__main__":
             up_api=up_api, query_params=query_params, account_name=up_account.name, url=up_account.url
         )
 
-        reconcile_transactions(actual_session=actual, transactions=account_transactions)
+        reconcile_transactions(
+            actual_session=actual, transactions=account_transactions, start_date=query_params.start_date
+        )
         up_account.next_url = account_transactions.next_url
 
         while up_account.next_url:
@@ -35,5 +37,7 @@ if __name__ == "__main__":
                 up_api=up_api, query_params=None, account_name=up_account.name, url=up_account.next_url
             )
 
-            reconcile_transactions(actual_session=actual, transactions=account_transactions)
+            reconcile_transactions(
+                actual_session=actual, transactions=account_transactions, start_date=query_params.start_date
+            )
             up_account.next_url = account_transactions.next_url
