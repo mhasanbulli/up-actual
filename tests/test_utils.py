@@ -1,11 +1,11 @@
-import pytest
-
 from datetime import datetime
 
-from up.utils import get_token, get_rfc_3339_date_offset
+import pytest
+from up.utils import get_rfc_3339_date_offset, get_token
+
 
 @pytest.mark.parametrize("token", ["", "up-token"])
-def test_get_token(monkeypatch, token):
+def test_get_token(monkeypatch: pytest.MonkeyPatch, token: str):
     monkeypatch.setenv("UP_TOKEN", token)
 
     up_token = get_token()
