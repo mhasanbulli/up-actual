@@ -3,7 +3,7 @@ from decimal import Decimal
 from json import JSONDecodeError
 
 import ujson
-from actual import Actual, get_transactions, reconcile_transaction
+from actual import Session, Transactions, reconcile_transaction
 from actual.queries import get_ruleset
 from requests import RequestException
 
@@ -54,43 +54,40 @@ def get_transactions_batch(
 
 
 def reconcile_transactions(
-    actual_session: Actual, transactions: AccountBatchTransactions, start_date: datetime
-) -> None:
-    logger.info(f"Reconciling transactions for {transactions.account_name}...")
+    session: Session, transactions: AccountBatchTransactions, already_imported_transactions: list[Transactions]
+) -> list[Transactions]:
+    rule_set = get_ruleset(session)
 
-    already_imported_transactions = []
+    for transaction in transactions.transactions:
+        category_data = transaction.get("relationships", {}).get("category", {}).get("data", {})
+        category = Categories(category_data.get("id")) if category_data else None
+        simplified_category = SimplifiedCategories.get_simplified_category_label(category_class=category)
 
-    with actual_session as a:
-        rule_set = get_ruleset(a.session)
+        transaction_attributes = transaction.get("attributes")
 
-        logger.info("Getting transactions from Actual...")
-
-        existing_transactions_from_actual = get_transactions(
-            a.session, account=transactions.account_name, start_date=start_date
+        amount = (
+            Decimal(transaction_attributes["amount"]["value"])
+            + Decimal(transaction_attributes["roundUp"]["amount"]["value"])
+            if transaction_attributes["roundUp"]
+            else Decimal(transaction_attributes["amount"]["value"])
         )
 
-        already_imported_transactions.extend(existing_transactions_from_actual)
+        reconciled_transaction = reconcile_transaction(
+            s=session,
+            imported_id=transaction["id"],
+            date=datetime.fromisoformat(transaction_attributes["createdAt"]).date(),
+            account=transactions.account_name,
+            payee=transaction_attributes["description"],
+            imported_payee=transaction_attributes["rawText"],
+            notes=transaction_attributes["message"],
+            amount=amount,
+            category=simplified_category,
+            cleared=bool(transaction_attributes["status"] == "SETTLED"),
+            already_matched=already_imported_transactions,
+            update_existing=True,
+        )
+        already_imported_transactions.append(reconciled_transaction)
 
-        for transaction in transactions.transactions:
-            category_data = transaction.get("relationships", {}).get("category", {}).get("data", {})
-            category = Categories(category_data.get("id")) if category_data else None
-            simplified_category = SimplifiedCategories.get_simplified_category_label(category_class=category)
+    rule_set.run(already_imported_transactions)
 
-            reconciled_transaction = reconcile_transaction(
-                a.session,
-                date=datetime.fromisoformat(transaction["attributes"]["createdAt"]).date(),
-                account=transactions.account_name,
-                payee=transaction["attributes"]["description"],
-                imported_payee=transaction["attributes"]["rawText"],
-                notes=transaction["attributes"]["message"],
-                amount=Decimal(transaction["attributes"]["amount"]["value"]),
-                imported_id=transaction["id"],
-                category=simplified_category,
-                cleared=bool(transaction["attributes"]["status"] == "SETTLED"),
-                already_matched=already_imported_transactions,
-                update_existing=True,
-            )
-            already_imported_transactions.append(reconciled_transaction)
-
-        rule_set.run(already_imported_transactions)
-        a.commit()
+    return already_imported_transactions
