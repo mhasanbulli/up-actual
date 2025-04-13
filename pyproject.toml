@@ -5,7 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "actualpy==0.11.0",
+    "actualpy==0.12.1",
     "jsonschema~=4.0",
     "pre-commit~=4.0",
     "pydantic~=2.0",
@@ -16,11 +16,7 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = [
-    "pyright==1.1.394",
-    "pytest~=8.0",
-    "ruff~=0.9",
-]
+dev = ["pyright==1.1.394", "pytest~=8.0", "ruff~=0.9"]
 
 [tool.pyright]
 include = ["up", "tests"]
@@ -58,9 +54,7 @@ select = [
     "S113", # request-without-timeout
     "FA",   # flake8-future-annotations (for python 3.7/8/9)
 ]
-ignore = [
-    "ANN204",
-]
+ignore = ["ANN204"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
@@ -77,5 +71,5 @@ allow-star-arg-any = true
 [tool.pytest.ini_options]
 markers = [
     "integration: marks tests as integration (deselect with '-m \"not integration\"')",
-    "schema: marks tests that validates schema of a given endpoint (deselect with '-m \"not schema\"')"
+    "schema: marks tests that validates schema of a given endpoint (deselect with '-m \"not schema\"')",
 ]
