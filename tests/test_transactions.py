@@ -1,30 +1,36 @@
-from decimal import Decimal
-from datetime import datetime
-import ujson
 from unittest.mock import MagicMock, patch
-from up.transactions import get_account_transaction_urls, get_transactions_batch, reconcile_transactions, create_transactions
-from up.classes import UpAPI, UpAccount, QueryParams, AccountBatchTransactions
+
+import ujson
+from up.classes import AccountBatchTransactions, QueryParams, UpAccount, UpAPI
+from up.transactions import (
+    create_transactions,
+    get_account_transaction_urls,
+    get_transactions_batch,
+    reconcile_transactions,
+)
 
 
 def test_get_account_transaction_urls():
     mock_api = MagicMock(spec=UpAPI)
     mock_api.accounts_url = "https://api.up.com.au/accounts"
-    mock_api.get_endpoint_response.return_value.text = ujson.dumps({
-        "data": [
-            {
-                "attributes": {"displayName": "Account 1"},
-                "relationships": {
-                    "transactions": {"links": {"related": "https://api.up.com.au/accounts/1/transactions"}}
+    mock_api.get_endpoint_response.return_value.text = ujson.dumps(
+        {
+            "data": [
+                {
+                    "attributes": {"displayName": "Account 1"},
+                    "relationships": {
+                        "transactions": {"links": {"related": "https://api.up.com.au/accounts/1/transactions"}}
+                    },
                 },
-            },
-            {
-                "attributes": {"displayName": "Account 2"},
-                "relationships": {
-                    "transactions": {"links": {"related": "https://api.up.com.au/accounts/2/transactions"}}
+                {
+                    "attributes": {"displayName": "Account 2"},
+                    "relationships": {
+                        "transactions": {"links": {"related": "https://api.up.com.au/accounts/2/transactions"}}
+                    },
                 },
-            },
-        ]
-    })
+            ]
+        }
+    )
 
     result = get_account_transaction_urls(mock_api)
 
@@ -35,10 +41,9 @@ def test_get_account_transaction_urls():
 
 def test_get_transactions_batch():
     mock_api = MagicMock(spec=UpAPI)
-    mock_api.get_endpoint_response.return_value.text = ujson.dumps({
-        "data": [{"id": "txn1"}, {"id": "txn2"}],
-        "links": {"next": "https://api.up.com.au/next-page"}
-    })
+    mock_api.get_endpoint_response.return_value.text = ujson.dumps(
+        {"data": [{"id": "txn1"}, {"id": "txn2"}], "links": {"next": "https://api.up.com.au/next-page"}}
+    )
 
     query_params = MagicMock(spec=QueryParams)
     query_params.get_params.return_value = {"page[size]": 10}
@@ -47,7 +52,7 @@ def test_get_transactions_batch():
         up_api=mock_api,
         query_params=query_params,
         account_name="Test Account",
-        url="https://api.up.com.au/accounts/1/transactions"
+        url="https://api.up.com.au/accounts/1/transactions",
     )
 
     assert isinstance(result, AccountBatchTransactions)
@@ -72,10 +77,12 @@ def test_reconcile_transactions():
         },
         "relationships": {"category": {"data": {"id": "cat1"}}},
     }
-    with patch("up.transactions.get_ruleset", return_value=mock_rule_set), \
-         patch("up.transactions.Categories", return_value="cat1"), \
-         patch("up.transactions.SimplifiedCategories.get_simplified_category_label", return_value="SimpleCat"), \
-         patch("up.transactions.reconcile_transaction", return_value="reconciled_txn") as mock_reconcile:
+    with (
+        patch("up.transactions.get_ruleset", return_value=mock_rule_set),
+        patch("up.transactions.Categories", return_value="cat1"),
+        patch("up.transactions.SimplifiedCategories.get_simplified_category_label", return_value="SimpleCat"),
+        patch("up.transactions.reconcile_transaction", return_value="reconciled_txn") as mock_reconcile,
+    ):
         reconcile_transactions(
             session=mock_session,
             account_name="Test Account",
@@ -102,10 +109,12 @@ def test_create_transactions():
         },
         "relationships": {"category": {"data": {"id": "cat2"}}},
     }
-    with patch("up.transactions.get_ruleset", return_value=mock_rule_set), \
-         patch("up.transactions.Categories", return_value="cat2"), \
-         patch("up.transactions.SimplifiedCategories.get_simplified_category_label", return_value="SimpleCat"), \
-         patch("up.transactions.create_transaction", return_value="created_txn") as mock_create:
+    with (
+        patch("up.transactions.get_ruleset", return_value=mock_rule_set),
+        patch("up.transactions.Categories", return_value="cat2"),
+        patch("up.transactions.SimplifiedCategories.get_simplified_category_label", return_value="SimpleCat"),
+        patch("up.transactions.create_transaction", return_value="created_txn") as mock_create,
+    ):
         create_transactions(
             session=mock_session,
             account_name="Test Account",
