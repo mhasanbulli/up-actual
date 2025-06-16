@@ -5,9 +5,8 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "actualpy==0.12.1",
+    "actualpy==0.13.0",
     "jsonschema~=4.0",
-    "pre-commit~=4.0",
     "pydantic~=2.0",
     "pydantic-settings~=2.0",
     "pytz~=2025.0",
@@ -16,7 +15,12 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["pyright==1.1.394", "pytest~=8.0", "ruff~=0.9"]
+dev = [
+    "pre-commit~=4.0",
+    "pyright==1.1.402",
+    "pytest~=8.0",
+    "ruff~=0.11",
+]
 
 [tool.pyright]
 include = ["up", "tests"]
