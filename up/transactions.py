@@ -84,7 +84,7 @@ def reconcile_transactions(
             category=simplified_category,
             cleared=bool(transaction_attributes["status"] == "SETTLED"),
             already_matched=already_imported_transactions,
-            update_existing=True,
+            update_existing=False,
         )
 
         rule_set.run(reconciled_transaction)
