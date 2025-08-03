@@ -38,7 +38,7 @@ class UpAPI:
 
     def get_endpoint_response(self, url: str, url_params: dict | None = None) -> Response:
         url = get_url(url, url_params)
-        response = requests.get(url=url, headers=self.headers)
+        response = requests.get(url=url, headers=self.headers, timeout=30)
 
         return response
 
