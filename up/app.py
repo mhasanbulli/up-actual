@@ -15,7 +15,7 @@ from up.transactions import (
 logger.info("Starting up...")
 
 up_api = UpAPI()
-query_params = QueryParams(start_date=datetime.datetime(2025, 7, 1), days_offset=0, page_size=100)
+query_params = QueryParams(start_date=datetime.datetime(2025, 8, 1), days_offset=0, page_size=100)
 actual_settings = Settings()  # type: ignore
 
 actual_init = ActualSession(
