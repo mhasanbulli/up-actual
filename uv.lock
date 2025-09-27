@@ -1,4 +1,3 @@
-version = 1
 revision = 3
 requires-python = ">=3.12"
 
@@ -16,6 +15,7 @@ dependencies = [
     { name = "sqlalchemy" },
     { name = "sqlmodel" },
 ]
+
 sdist = { url = "https://files.pythonhosted.org/packages/c8/90/3c10d7c815517717df269cea266779cb535bc3dc6bb5134e4243abc6ae4e/actualpy-0.16.0.tar.gz", hash = "sha256:82197d0dccad8950342a7da40b24efb14b09fb981c29d35b73d4f72ecfb137bc", size = 92499, upload-time = "2025-09-05T19:49:44.06Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/df/a1/4e1a31d6936db1f62a3b6ec581a67a95dd6e6311710c026dd8c2ff7be1af/actualpy-0.16.0-py3-none-any.whl", hash = "sha256:424214c041fc608b9494bd71e3a88137b872012fc5602ce810c0e3f4362317e8", size = 78378, upload-time = "2025-09-05T19:49:42.663Z" },
