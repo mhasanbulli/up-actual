@@ -1,10 +1,10 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.12"
 
 [[package]]
 name = "actualpy"
-version = "0.13.0"
+version = "0.16.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cryptography" },
@@ -16,9 +16,9 @@ dependencies = [
     { name = "sqlalchemy" },
     { name = "sqlmodel" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cd/12/3bb6c14f8034af5286ea949d7c8bd08b78fdb64cb4783cbe2b1bc8be7824/actualpy-0.13.0.tar.gz", hash = "sha256:137a5201a838fbfb0b44b24c11037bf6d18501225a41f4cef289e53ec9094bd3", size = 77844, upload-time = "2025-06-05T19:59:49.584Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c8/90/3c10d7c815517717df269cea266779cb535bc3dc6bb5134e4243abc6ae4e/actualpy-0.16.0.tar.gz", hash = "sha256:82197d0dccad8950342a7da40b24efb14b09fb981c29d35b73d4f72ecfb137bc", size = 92499, upload-time = "2025-09-05T19:49:44.06Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/48/5f/e6b8bf55e76ab91b9e077a0d8b215fe0947eb8b801741017b44d6396ec4a/actualpy-0.13.0-py3-none-any.whl", hash = "sha256:de476a95f37f3678bc2a49fbde2a51430a4c5e4af1eab3c44652a155daa5d1e6", size = 64798, upload-time = "2025-06-05T19:59:48.265Z" },
+    { url = "https://files.pythonhosted.org/packages/df/a1/4e1a31d6936db1f62a3b6ec581a67a95dd6e6311710c026dd8c2ff7be1af/actualpy-0.16.0-py3-none-any.whl", hash = "sha256:424214c041fc608b9494bd71e3a88137b872012fc5602ce810c0e3f4362317e8", size = 78378, upload-time = "2025-09-05T19:49:42.663Z" },
 ]
 
 [[package]]
@@ -789,7 +789,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "actualpy", specifier = "==0.13.0" },
+    { name = "actualpy", specifier = "==0.16.0" },
     { name = "jsonschema", specifier = "~=4.0" },
     { name = "pydantic", specifier = "~=2.0" },
     { name = "pydantic-settings", specifier = "~=2.0" },
