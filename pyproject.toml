@@ -17,9 +17,9 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pre-commit~=4.0",
-    "pyright==1.1.402",
+    "pyright==1.1.406",
     "pytest~=8.0",
-    "ruff~=0.11",
+    "ruff~=0.14",
 ]
 
 [tool.pyright]
