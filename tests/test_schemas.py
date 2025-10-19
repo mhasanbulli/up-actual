@@ -1,9 +1,10 @@
+from datetime import datetime
 from pathlib import Path
 
 import pytest
 import ujson
 from up.classes import UpAPI
-from up.utils import load_json, schema_validator
+from up.utils import get_rfc_3339_date_offset, load_json, schema_validator
 
 ACCOUNTS_SCHEMA = load_json(Path(__file__).parent.parent / "schemas/accounts.schema.json")
 TRANSACTIONS_SCHEMA = load_json(Path(__file__).parent.parent / "schemas/transactions.schema.json")
@@ -25,6 +26,7 @@ def test_transactions_schema():
     url_params = {
         "page[size]": 1,
         "filter[status]": "SETTLED",
+        "filter[since]": get_rfc_3339_date_offset(start_date=datetime.now(), days_offset=1),
     }
 
     response = up_api.get_endpoint_response(url=transactions_url, url_params=url_params)

@@ -1,6 +1,6 @@
 FROM python:3.12-slim AS base
 
-COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.6 /uv /uvx /bin/
 
 WORKDIR /up/
 
@@ -23,9 +23,5 @@ CMD ["cron", "-f"]
 
 FROM base AS testing
 
-RUN apt-get update && apt-get install --no-install-recommends -y make curl git
+RUN apt-get update && apt-get install --no-install-recommends -y make curl git libatomic1
 COPY . ./
-
-
-
-
