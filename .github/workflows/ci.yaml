@@ -1,4 +1,4 @@
-name: Test in Docker
+name: Check & Test
 
 on:
   push:
@@ -12,6 +12,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: "Set up Python"
+        run: uv python install
 
       - name: Test All
         run: make check test-all
