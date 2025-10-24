@@ -7,7 +7,7 @@ on:
 
 jobs:
   test-in-docker:
-    name: Test in Docker
+    name: Check & Test
     runs-on: ubuntu-latest
 
     steps:
