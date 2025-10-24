@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Run tests in Docker
-        run: docker compose run --build --rm test
+      - name: Test All
+        run: make test-all
         env:
           UP_TOKEN: ${{ secrets.UP_TOKEN }}
