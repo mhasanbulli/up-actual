@@ -1,3 +1,5 @@
+import sys
+
 import structlog
 
 structlog.configure(
@@ -7,7 +9,7 @@ structlog.configure(
         structlog.dev.ConsoleRenderer(),
     ],
     context_class=dict,
-    logger_factory=structlog.PrintLoggerFactory(),
+    logger_factory=structlog.PrintLoggerFactory(file=sys.stdout),
 )
 
 logger = structlog.get_logger()

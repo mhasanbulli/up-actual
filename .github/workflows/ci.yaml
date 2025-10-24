@@ -1,4 +1,4 @@
-name: Test in Docker
+name: Check & Test
 
 on:
   push:
@@ -7,13 +7,19 @@ on:
 
 jobs:
   test-in-docker:
-    name: Test in Docker
+    name: Check & Test
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v5
 
-      - name: Run tests in Docker
-        run: docker compose run --build --rm test
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: "Set up Python"
+        run: uv python install
+
+      - name: Test All
+        run: make check test-all
         env:
           UP_TOKEN: ${{ secrets.UP_TOKEN }}
