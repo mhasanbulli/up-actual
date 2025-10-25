@@ -1,6 +1,7 @@
 import datetime
-from dotenv import load_dotenv, find_dotenv
+
 import typer
+from dotenv import load_dotenv
 
 from up.classes import ActualSession, QueryParams, UpAPI
 from up.config import Settings
