@@ -1,5 +1,5 @@
 import pytest
-from up.app_config import Settings
+from up.config import Settings
 
 
 def test_get_settings(mock_actual_env_vars: pytest.MonkeyPatch):  # noqa: ARG001
