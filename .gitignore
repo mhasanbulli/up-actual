@@ -17,3 +17,5 @@ wheels/
 
 *.db
 .env
+
+.coverage

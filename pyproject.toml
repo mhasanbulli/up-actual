@@ -20,6 +20,7 @@ dev = [
     "pre-commit~=4.0",
     "pyright==1.1.406",
     "pytest~=8.0",
+    "pytest-cov~=7.0",
     "ruff~=0.14",
 ]
 
@@ -78,3 +79,4 @@ markers = [
     "integration: marks tests as integration (deselect with '-m \"not integration\"')",
     "schema: marks tests that validates schema of a given endpoint (deselect with '-m \"not schema\"')",
 ]
+addopts = "--cov=up --cov-report=term"
