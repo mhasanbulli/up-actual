@@ -1,4 +1,5 @@
 import datetime
+from typing import Annotated
 
 import typer
 from dotenv import load_dotenv
@@ -18,13 +19,72 @@ if load_dotenv():
 else:
     print("No .env file found...")
 
-app = typer.Typer()
+app = typer.Typer(
+    name="up-actual",
+    help="Synchronise transactions from Up Banking to Actual Budget",
+    add_completion=False,
+)
 
 
 @app.command()
-def reconcile() -> None:
+def reconcile(
+    start_date: Annotated[
+        str | None,
+        typer.Option(
+            "--start-date",
+            help="Start date in ISO format (YYYY-MM-DD). If provided, overrides --days-back.",
+        ),
+    ] = None,
+    days_back: Annotated[
+        int,
+        typer.Option(
+            "--days-back",
+            help="Number of days back from today to sync transactions (default: 30)",
+        ),
+    ] = 30,
+    page_size: Annotated[
+        int,
+        typer.Option(
+            "--page-size",
+            help="Number of transactions to fetch per API request (default: 100, max: 100)",
+        ),
+    ] = 100,
+) -> None:
+    """
+    Reconcile transactions from Up Banking to Actual Budget.
+
+    This command fetches transactions from your Up Banking accounts and syncs them
+    to Actual Budget. It will create new transactions and update existing ones.
+
+    Examples:
+
+        # Sync transactions from the last 30 days (default)
+        $ up-actual reconcile
+
+        # Sync transactions from the last 90 days
+        $ up-actual reconcile --days-back 90
+
+        # Sync transactions from a specific date
+        $ up-actual reconcile --start-date 2025-01-01
+
+        # Customize the page size
+        $ up-actual reconcile --page-size 50
+    """
     up_api = UpAPI()
-    query_params = QueryParams(start_date=datetime.datetime(2025, 10, 1), days_offset=0, page_size=100)
+
+    # Determine the start date
+    if start_date:
+        try:
+            parsed_date = datetime.datetime.fromisoformat(start_date)
+            logger.info(f"Using provided start date: {start_date}")
+        except ValueError as e:
+            logger.error(f"Invalid date format: {start_date}. Expected format: YYYY-MM-DD")
+            raise typer.Exit(code=1) from e
+    else:
+        parsed_date = datetime.datetime.now() - datetime.timedelta(days=days_back)
+        logger.info(f"Syncing transactions from the last {days_back} days")
+
+    query_params = QueryParams(start_date=parsed_date, days_offset=0, page_size=page_size)
     actual_settings = Settings()  # type: ignore
 
     actual_init = ActualSession(
