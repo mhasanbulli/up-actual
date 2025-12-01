@@ -80,3 +80,6 @@ markers = [
     "schema: marks tests that validates schema of a given endpoint (deselect with '-m \"not schema\"')",
 ]
 addopts = "--cov=up --cov-report=term"
+
+[tool.typos.default.extend-words]
+actualpy = "actualpy"

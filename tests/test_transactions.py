@@ -1,11 +1,14 @@
 from unittest.mock import MagicMock, patch
 
+import pytest
 import ujson
+from requests import RequestException
 from up.classes import AccountBatchTransactions, QueryParams, UpAccount, UpAPI
 from up.transactions import (
     create_transactions,
     get_account_transaction_urls,
     get_transactions_batch,
+    reconcile_accounts,
     reconcile_transactions,
 )
 
@@ -122,3 +125,273 @@ def test_create_transactions():
         )
         mock_create.assert_called_once()
         mock_rule_set.run.assert_called_once_with("created_txn")
+
+
+def test_get_transactions_batch_no_next_page():
+    mock_api = MagicMock(spec=UpAPI)
+    mock_api.get_endpoint_response.return_value.text = ujson.dumps(
+        {"data": [{"id": "txn1"}], "links": {}}  # No "next" key in links
+    )
+
+    query_params = MagicMock(spec=QueryParams)
+    query_params.get_params.return_value = {"page[size]": 10}
+
+    result = get_transactions_batch(
+        up_api=mock_api,
+        query_params=query_params,
+        account_name="Test Account",
+        url="https://api.up.com.au/accounts/1/transactions",
+    )
+
+    assert result.next_url is None
+
+
+def test_get_transactions_batch_empty_list():
+    mock_api = MagicMock(spec=UpAPI)
+    mock_api.get_endpoint_response.return_value.text = ujson.dumps({"data": [], "links": {}})
+
+    query_params = MagicMock(spec=QueryParams)
+    query_params.get_params.return_value = {"page[size]": 10}
+
+    result = get_transactions_batch(
+        up_api=mock_api,
+        query_params=query_params,
+        account_name="Test Account",
+        url="https://api.up.com.au/accounts/1/transactions",
+    )
+
+    assert len(result.transactions) == 0
+    assert result.account_name == "Test Account"
+
+
+def test_get_transactions_batch_with_no_query_params():
+    mock_api = MagicMock(spec=UpAPI)
+    mock_api.get_endpoint_response.return_value.text = ujson.dumps({"data": [{"id": "txn1"}], "links": {}})
+
+    result = get_transactions_batch(
+        up_api=mock_api,
+        query_params=None,
+        account_name="Test Account",
+        url="https://api.up.com.au/accounts/1/transactions",
+    )
+
+    mock_api.get_endpoint_response.assert_called_once_with(
+        url="https://api.up.com.au/accounts/1/transactions", url_params=None
+    )
+    assert len(result.transactions) == 1
+
+
+def test_get_transactions_batch_request_exception():
+    mock_api = MagicMock(spec=UpAPI)
+    mock_api.get_endpoint_response.side_effect = RequestException("Network error")
+
+    query_params = MagicMock(spec=QueryParams)
+    query_params.get_params.return_value = {"page[size]": 10}
+
+    with pytest.raises(RequestException):
+        get_transactions_batch(
+            up_api=mock_api,
+            query_params=query_params,
+            account_name="Test Account",
+            url="https://api.up.com.au/accounts/1/transactions",
+        )
+
+
+def test_get_account_transaction_urls_empty_accounts():
+    mock_api = MagicMock(spec=UpAPI)
+    mock_api.accounts_url = "https://api.up.com.au/accounts"
+    mock_api.get_endpoint_response.return_value.text = ujson.dumps({"data": []})
+
+    result = get_account_transaction_urls(mock_api)
+
+    assert len(result) == 0
+
+
+def test_reconcile_transactions_without_category():
+    mock_session = MagicMock()
+    mock_rule_set = MagicMock()
+    mock_transaction = {
+        "id": "txn3",
+        "attributes": {
+            "createdAt": "2025-06-10T12:00:00Z",
+            "description": "Test Payee",
+            "rawText": "Raw Payee",
+            "message": None,
+            "amount": {"value": "100.00"},
+            "roundUp": None,
+            "status": "HELD",
+        },
+        "relationships": {"category": {"data": None}},
+    }
+    with (
+        patch("up.transactions.get_ruleset", return_value=mock_rule_set),
+        patch("up.transactions.SimplifiedCategories.get_simplified_category_label", return_value=None),
+        patch("up.transactions.reconcile_transaction", return_value="reconciled_txn") as mock_reconcile,
+    ):
+        reconcile_transactions(
+            session=mock_session,
+            account_name="Test Account",
+            transactions=[mock_transaction],
+            already_imported_transactions=[],
+        )
+        mock_reconcile.assert_called_once()
+
+        call_args = mock_reconcile.call_args
+        assert call_args[1]["cleared"] is False
+        assert call_args[1]["category"] is None
+
+
+def test_create_transactions_without_round_up():
+    mock_session = MagicMock()
+    mock_rule_set = MagicMock()
+    mock_transaction = {
+        "id": "txn4",
+        "attributes": {
+            "createdAt": "2025-06-10T12:00:00Z",
+            "description": "Test Payee",
+            "rawText": "Raw Payee",
+            "message": "Test",
+            "amount": {"value": "75.50"},
+            "roundUp": None,
+            "status": "SETTLED",
+        },
+        "relationships": {"category": {"data": {"id": "groceries"}}},
+    }
+    with (
+        patch("up.transactions.get_ruleset", return_value=mock_rule_set),
+        patch("up.transactions.Categories", return_value="groceries"),
+        patch("up.transactions.SimplifiedCategories.get_simplified_category_label", return_value="Groceries"),
+        patch("up.transactions.create_transaction", return_value="created_txn") as mock_create,
+    ):
+        create_transactions(
+            session=mock_session,
+            account_name="Test Account",
+            transactions=[mock_transaction],
+        )
+        mock_create.assert_called_once()
+
+        call_args = mock_create.call_args
+        from decimal import Decimal
+
+        assert call_args[1]["amount"] == Decimal("75.50")
+
+
+def test_create_transactions_multiple():
+    mock_session = MagicMock()
+    mock_rule_set = MagicMock()
+    mock_transactions = [
+        {
+            "id": f"txn{i}",
+            "attributes": {
+                "createdAt": "2025-06-10T12:00:00Z",
+                "description": f"Payee {i}",
+                "rawText": f"Raw {i}",
+                "message": None,
+                "amount": {"value": f"{i * 10}.00"},
+                "roundUp": None,
+                "status": "SETTLED",
+            },
+            "relationships": {"category": {"data": {"id": f"cat{i}"}}},
+        }
+        for i in range(1, 4)
+    ]
+
+    with (
+        patch("up.transactions.get_ruleset", return_value=mock_rule_set),
+        patch("up.transactions.Categories"),
+        patch("up.transactions.SimplifiedCategories.get_simplified_category_label", return_value="General"),
+        patch("up.transactions.create_transaction", return_value="created_txn") as mock_create,
+    ):
+        create_transactions(
+            session=mock_session,
+            account_name="Test Account",
+            transactions=mock_transactions,
+        )
+
+        assert mock_create.call_count == 3
+        assert mock_rule_set.run.call_count == 3
+
+
+def test_reconcile_accounts_with_empty_accounts():
+    mock_up_api = MagicMock()
+    mock_actual_session = MagicMock()
+    mock_query_params = MagicMock()
+
+    reconcile_accounts(
+        accounts=[], up_api=mock_up_api, actual_session=mock_actual_session, query_params=mock_query_params
+    )
+
+
+def test_reconcile_accounts_with_pagination():
+    mock_up_api = MagicMock()
+    mock_actual_session = MagicMock()
+    mock_query_params = MagicMock()
+    mock_query_params.start_date = "2025-01-01"
+
+    mock_account = UpAccount(name="Test Account", url="https://api.example.com/transactions")
+
+    # First batch
+    first_batch = {
+        "id": "txn1",
+        "attributes": {
+            "createdAt": "2025-06-10T12:00:00Z",
+            "description": "Test",
+            "rawText": "Raw",
+            "message": None,
+            "amount": {"value": "100.00"},
+            "roundUp": None,
+            "status": "SETTLED",
+        },
+        "relationships": {"category": {"data": {"id": "cat1"}}},
+    }
+
+    # Second batch
+    second_batch = {
+        "id": "txn2",
+        "attributes": {
+            "createdAt": "2025-06-11T12:00:00Z",
+            "description": "Test 2",
+            "rawText": "Raw 2",
+            "message": None,
+            "amount": {"value": "50.00"},
+            "roundUp": None,
+            "status": "SETTLED",
+        },
+        "relationships": {"category": {"data": {"id": "cat2"}}},
+    }
+
+    with (
+        patch("up.transactions.get_transactions_batch") as mock_get_batch,
+        patch("up.transactions.get_transactions") as mock_get_actual_txns,
+        patch("up.transactions.reconcile_transactions") as mock_reconcile,
+        patch("up.transactions.create_transactions") as mock_create,
+    ):
+        # Mock get_transactions_batch to return first batch, then second batch, then no next_url
+        mock_get_batch.side_effect = [
+            AccountBatchTransactions(
+                account_name="Test Account", transactions=[first_batch], next_url="https://api.example.com/next"
+            ),
+            AccountBatchTransactions(account_name="Test Account", transactions=[second_batch], next_url=None),
+        ]
+
+        # Mock Actual Budget transactions
+        mock_get_actual_txns.return_value = []
+
+        # Mock Actual session context manager
+        mock_session_context = MagicMock()
+        mock_actual_session.__enter__.return_value = mock_session_context
+        mock_actual_session.__exit__.return_value = None
+
+        reconcile_accounts(
+            accounts=[mock_account],
+            up_api=mock_up_api,
+            actual_session=mock_actual_session,
+            query_params=mock_query_params,
+        )
+
+        # Should be called twice - once for first batch, once for second batch
+        assert mock_get_batch.call_count == 2
+        # Should create transactions twice (once per batch)
+        assert mock_create.call_count == 2
+        # Should reconcile twice (once per batch, though with empty already_imported)
+        assert mock_reconcile.call_count == 2
