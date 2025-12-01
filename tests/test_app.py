@@ -1,5 +1,4 @@
 import datetime
-from turtle import color
 from unittest.mock import MagicMock, patch
 
 import pytest
