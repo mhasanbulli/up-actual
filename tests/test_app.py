@@ -184,7 +184,6 @@ def test_reconcile_command_help():
 
     assert result.exit_code == 0
     assert "Reconcile transactions from Up Banking to Actual Budget" in result.output
-    # Check for options - they might be formatted differently, so check flexibly
-    assert "start-date" in result.output
-    assert "days-back" in result.output
-    assert "page-size" in result.output
+    assert "--start-date" in result.output
+    assert "--days-back" in result.output
+    assert "--page-size" in result.output
