@@ -179,7 +179,7 @@ def test_reconcile_command_invalid_date_format():
 
 
 def test_reconcile_command_help():
-    result = runner.invoke(app, ["--help"])
+    result = runner.invoke(app, ["reconcile", "--help"])
 
     assert result.exit_code == 0
     assert "Reconcile transactions from Up Banking to Actual Budget" in result.output
