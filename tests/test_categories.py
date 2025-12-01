@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import ujson
-
 from up.categories import get_categories
 
 
@@ -53,4 +52,3 @@ def test_get_categories_single_category():
 
         assert len(result) == 1
         assert result[0] == "single-category"
-
