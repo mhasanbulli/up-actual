@@ -1,4 +1,5 @@
 import datetime
+from turtle import color
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -179,7 +180,7 @@ def test_reconcile_command_invalid_date_format():
 
 
 def test_reconcile_command_help():
-    result = runner.invoke(app, ["reconcile", "--help"], color=False)
+    result = runner.invoke(app, ["reconcile", "--help"], color=False, env={"NO_COLOR": "1", "TERM": "dumb"})
 
     assert result.exit_code == 0
     assert "Reconcile transactions from Up Banking to Actual Budget" in result.output
