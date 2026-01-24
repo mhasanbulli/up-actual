@@ -5,7 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "actualpy==0.18.0",
+    "actualpy==0.19",
     "jsonschema~=4.0",
     "pydantic~=2.0",
     "pydantic-settings~=2.0",
