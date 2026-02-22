@@ -36,7 +36,7 @@ def test_up_api_categories_url(up_api: UpAPI):
 
 def test_query_params_get_params():
     params = QueryParams(
-        start_date=datetime.datetime(2025, 7, 10, 12, 0, 0, tzinfo=datetime.timezone.utc),
+        start_date=datetime.datetime(2025, 7, 10, 12, 0, 0, tzinfo=datetime.UTC),
         page_size=50,
         days_offset=5,
     )
