@@ -8,16 +8,18 @@ PYTHONPATH=$(shell pwd)
 help:
 	@awk '/^##.*$$/,/^[~\/\.0-9a-zA-Z_-]+:/' $(MAKEFILE_LIST) | awk '!(NR%2){print $$0p}{p=$$0}' | awk 'BEGIN {FS = ":.*?##"}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' | sort
 
-venv ?= .venv
+.uv:
+	@uv --version || { echo 'Please install uv: https://docs.astral.sh/uv/getting-started/installation/' && exit 13 ;}
 
-# delete the venv
+.sync:
+	uv sync
+
+## delete the venv
 clean:
-	rm -rf $(venv)
+	rm -rf .venv
 
 ## create venv and install this package and hooks
-install: install-hooks
-	uv sync
-	touch $(venv)
+install: .uv .sync $(if $(value CI),,install-hooks)
 
 
 install-hooks: .git/hooks/pre-push

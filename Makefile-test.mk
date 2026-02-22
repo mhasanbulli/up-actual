@@ -7,7 +7,7 @@ format: export SKIP=pyright,test
 format: hooks
 
 ## pyright type check
-pyright: 
+pyright:
 	uv run pyright
 
 ## run tests

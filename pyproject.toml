@@ -5,7 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "actualpy==0.19",
+    "actualpy==0.21",
     "jsonschema~=4.0",
     "pydantic~=2.0",
     "pydantic-settings~=2.0",
@@ -79,7 +79,12 @@ markers = [
     "integration: marks tests as integration (deselect with '-m \"not integration\"')",
     "schema: marks tests that validates schema of a given endpoint (deselect with '-m \"not schema\"')",
 ]
-addopts = "--cov=up --cov-report=term"
+addopts = [
+    "--cov=up",
+    "--cov-append",
+    "--cov-report=term-missing",
+    "--no-cov-on-fail"
+]
 
 [tool.typos.default.extend-words]
 actualpy = "actualpy"
