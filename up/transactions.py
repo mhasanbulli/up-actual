@@ -120,79 +120,55 @@ def create_transactions(
         rule_set.run(created_transaction)
 
 
+def classify_transactions(up_transactions: list, actual_financial_ids: set[str]) -> tuple[list, list]:
+    already_imported = []
+    new = []
+    for transaction in up_transactions:
+        if transaction["id"] in actual_financial_ids:
+            already_imported.append(transaction)
+        else:
+            new.append(transaction)
+    return already_imported, new
+
+
+def process_batch(session: Session, account_name: str, up_transactions: list, start_date: datetime) -> None:
+    logger.info("Getting transactions from Actual...")
+    transactions_from_actual = get_transactions(session, account=account_name, start_date=start_date)
+    actual_financial_ids = {
+        transaction.financial_id for transaction in transactions_from_actual if transaction.financial_id
+    }
+
+    already_imported, new = classify_transactions(up_transactions, actual_financial_ids)
+
+    reconcile_transactions(
+        session=session,
+        account_name=account_name,
+        transactions=already_imported,
+        already_imported_transactions=already_imported,
+    )
+    create_transactions(session=session, account_name=account_name, transactions=new)
+
+
 def reconcile_accounts(
     accounts: list[UpAccount], up_api: UpAPI, actual_session: Actual, query_params: QueryParams
 ) -> None:
     for up_account in accounts:
-        transactions_from_up = get_transactions_batch(
+        batch = get_transactions_batch(
             up_api=up_api, query_params=query_params, account_name=up_account.name, url=up_account.url
         )
 
-        if transactions_from_up.transactions:
-            with actual_session as a:
-                logger.info("Getting transactions from Actual...")
+        if not batch.transactions:
+            continue
 
-                transactions_from_actual = get_transactions(
-                    a.session, account=transactions_from_up.account_name, start_date=query_params.start_date
+        with actual_session as a:
+            process_batch(a.session, batch.account_name, batch.transactions, query_params.start_date)
+            a.commit()
+
+            next_url = batch.next_url
+            while next_url:
+                batch = get_transactions_batch(
+                    up_api=up_api, query_params=None, account_name=up_account.name, url=next_url
                 )
-
-                already_imported_transactions = []
-                new_transactions = []
-                actual_financial_ids = {transaction.financial_id for transaction in transactions_from_actual}
-
-                # Separate new, and already existing transactions. Existing transactions will be reconciled.
-                # New transactions will be inserted.
-                for transaction_from_up in transactions_from_up.transactions:
-                    if transaction_from_up["id"] in actual_financial_ids:
-                        already_imported_transactions.append(transaction_from_up)
-                    else:
-                        new_transactions.append(transaction_from_up)
-
-                reconcile_transactions(
-                    session=a.session,
-                    account_name=transactions_from_up.account_name,
-                    transactions=already_imported_transactions,
-                    already_imported_transactions=already_imported_transactions,
-                )
-
-                create_transactions(
-                    session=a.session, account_name=transactions_from_up.account_name, transactions=new_transactions
-                )
-
+                process_batch(a.session, batch.account_name, batch.transactions, query_params.start_date)
                 a.commit()
-
-                up_account.next_url = transactions_from_up.next_url
-
-                while up_account.next_url:
-                    transactions_from_up = get_transactions_batch(
-                        up_api=up_api, query_params=None, account_name=up_account.name, url=up_account.next_url
-                    )
-
-                    transactions_from_actual = get_transactions(
-                        a.session, account=transactions_from_up.account_name, start_date=query_params.start_date
-                    )
-
-                    already_imported_transactions = []
-                    new_transactions = []
-                    actual_financial_ids = {transaction.financial_id for transaction in transactions_from_actual}
-
-                    for transaction_from_up in transactions_from_up.transactions:
-                        if transaction_from_up["id"] in actual_financial_ids:
-                            already_imported_transactions.append(transaction_from_up)
-                        else:
-                            new_transactions.append(transaction_from_up)
-
-                    reconcile_transactions(
-                        session=a.session,
-                        account_name=transactions_from_up.account_name,
-                        transactions=already_imported_transactions,
-                        already_imported_transactions=already_imported_transactions,
-                    )
-
-                    create_transactions(
-                        session=a.session, account_name=transactions_from_up.account_name, transactions=new_transactions
-                    )
-
-                    a.commit()
-
-                    up_account.next_url = transactions_from_up.next_url
+                next_url = batch.next_url

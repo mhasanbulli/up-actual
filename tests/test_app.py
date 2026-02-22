@@ -29,14 +29,7 @@ def test_reconcile_command_default_parameters(
     mock_actual_session: MagicMock,
     mock_get_accounts: MagicMock,
     mock_reconcile: MagicMock,
-    monkeypatch: pytest.MonkeyPatch,
 ):
-    monkeypatch.setenv("UP_TOKEN", "test_token")
-    monkeypatch.setenv("ACTUAL__URL", "https://actual.com")
-    monkeypatch.setenv("ACTUAL__PASSWORD", "password")
-    monkeypatch.setenv("ACTUAL__ENCRYPTION_PASSWORD", "enc_password")
-    monkeypatch.setenv("ACTUAL__FILE", "test_file")
-
     mock_settings.return_value.url.get_secret_value.return_value = "https://actual.com"
     mock_settings.return_value.password.get_secret_value.return_value = "password"
     mock_settings.return_value.encryption_password.get_secret_value.return_value = "enc_password"
@@ -69,14 +62,7 @@ def test_reconcile_command_with_start_date(
     mock_actual_session: MagicMock,
     mock_get_accounts: MagicMock,
     mock_reconcile: MagicMock,
-    monkeypatch: pytest.MonkeyPatch,
 ):
-    monkeypatch.setenv("UP_TOKEN", "test_token")
-    monkeypatch.setenv("ACTUAL__URL", "https://actual.com")
-    monkeypatch.setenv("ACTUAL__PASSWORD", "password")
-    monkeypatch.setenv("ACTUAL__ENCRYPTION_PASSWORD", "enc_password")
-    monkeypatch.setenv("ACTUAL__FILE", "test_file")
-
     mock_settings.return_value.url.get_secret_value.return_value = "https://actual.com"
     mock_settings.return_value.password.get_secret_value.return_value = "password"
     mock_settings.return_value.encryption_password.get_secret_value.return_value = "enc_password"
@@ -108,14 +94,7 @@ def test_reconcile_command_with_days_back(
     mock_actual_session: MagicMock,
     mock_get_accounts: MagicMock,
     mock_reconcile: MagicMock,
-    monkeypatch: pytest.MonkeyPatch,
 ):
-    monkeypatch.setenv("UP_TOKEN", "test_token")
-    monkeypatch.setenv("ACTUAL__URL", "https://actual.com")
-    monkeypatch.setenv("ACTUAL__PASSWORD", "password")
-    monkeypatch.setenv("ACTUAL__ENCRYPTION_PASSWORD", "enc_password")
-    monkeypatch.setenv("ACTUAL__FILE", "test_file")
-
     mock_settings.return_value.url.get_secret_value.return_value = "https://actual.com"
     mock_settings.return_value.password.get_secret_value.return_value = "password"
     mock_settings.return_value.encryption_password.get_secret_value.return_value = "enc_password"
@@ -143,14 +122,7 @@ def test_reconcile_command_with_page_size(
     mock_actual_session: MagicMock,
     mock_get_accounts: MagicMock,
     mock_reconcile: MagicMock,
-    monkeypatch: pytest.MonkeyPatch,
 ):
-    monkeypatch.setenv("UP_TOKEN", "test_token")
-    monkeypatch.setenv("ACTUAL__URL", "https://actual.com")
-    monkeypatch.setenv("ACTUAL__PASSWORD", "password")
-    monkeypatch.setenv("ACTUAL__ENCRYPTION_PASSWORD", "enc_password")
-    monkeypatch.setenv("ACTUAL__FILE", "test_file")
-
     mock_settings.return_value.url.get_secret_value.return_value = "https://actual.com"
     mock_settings.return_value.password.get_secret_value.return_value = "password"
     mock_settings.return_value.encryption_password.get_secret_value.return_value = "enc_password"

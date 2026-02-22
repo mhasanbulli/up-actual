@@ -1,3 +1,4 @@
+from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -5,9 +6,11 @@ import ujson
 from requests import RequestException
 from up.classes import AccountBatchTransactions, QueryParams, UpAccount, UpAPI
 from up.transactions import (
+    classify_transactions,
     create_transactions,
     get_account_transaction_urls,
     get_transactions_batch,
+    process_batch,
     reconcile_accounts,
     reconcile_transactions,
 )
@@ -78,12 +81,10 @@ def test_reconcile_transactions():
             "roundUp": None,
             "status": "SETTLED",
         },
-        "relationships": {"category": {"data": {"id": "cat1"}}},
+        "relationships": {"category": {"data": {"id": "groceries"}}},
     }
     with (
         patch("up.transactions.get_ruleset", return_value=mock_rule_set),
-        patch("up.transactions.Categories", return_value="cat1"),
-        patch("up.transactions.SimplifiedCategories.get_simplified_category_label", return_value="SimpleCat"),
         patch("up.transactions.reconcile_transaction", return_value="reconciled_txn") as mock_reconcile,
     ):
         reconcile_transactions(
@@ -110,12 +111,10 @@ def test_create_transactions():
             "roundUp": {"amount": {"value": "5.00"}},
             "status": "SETTLED",
         },
-        "relationships": {"category": {"data": {"id": "cat2"}}},
+        "relationships": {"category": {"data": {"id": "booze"}}},
     }
     with (
         patch("up.transactions.get_ruleset", return_value=mock_rule_set),
-        patch("up.transactions.Categories", return_value="cat2"),
-        patch("up.transactions.SimplifiedCategories.get_simplified_category_label", return_value="SimpleCat"),
         patch("up.transactions.create_transaction", return_value="created_txn") as mock_create,
     ):
         create_transactions(
@@ -225,7 +224,6 @@ def test_reconcile_transactions_without_category():
     }
     with (
         patch("up.transactions.get_ruleset", return_value=mock_rule_set),
-        patch("up.transactions.SimplifiedCategories.get_simplified_category_label", return_value=None),
         patch("up.transactions.reconcile_transaction", return_value="reconciled_txn") as mock_reconcile,
     ):
         reconcile_transactions(
@@ -259,8 +257,6 @@ def test_create_transactions_without_round_up():
     }
     with (
         patch("up.transactions.get_ruleset", return_value=mock_rule_set),
-        patch("up.transactions.Categories", return_value="groceries"),
-        patch("up.transactions.SimplifiedCategories.get_simplified_category_label", return_value="Groceries"),
         patch("up.transactions.create_transaction", return_value="created_txn") as mock_create,
     ):
         create_transactions(
@@ -279,6 +275,7 @@ def test_create_transactions_without_round_up():
 def test_create_transactions_multiple():
     mock_session = MagicMock()
     mock_rule_set = MagicMock()
+    category_ids = ["groceries", "booze", "fuel"]
     mock_transactions = [
         {
             "id": f"txn{i}",
@@ -291,15 +288,13 @@ def test_create_transactions_multiple():
                 "roundUp": None,
                 "status": "SETTLED",
             },
-            "relationships": {"category": {"data": {"id": f"cat{i}"}}},
+            "relationships": {"category": {"data": {"id": category_ids[i - 1]}}},
         }
         for i in range(1, 4)
     ]
 
     with (
         patch("up.transactions.get_ruleset", return_value=mock_rule_set),
-        patch("up.transactions.Categories"),
-        patch("up.transactions.SimplifiedCategories.get_simplified_category_label", return_value="General"),
         patch("up.transactions.create_transaction", return_value="created_txn") as mock_create,
     ):
         create_transactions(
@@ -395,3 +390,105 @@ def test_reconcile_accounts_with_pagination():
         assert mock_create.call_count == 2
         # Should reconcile twice (once per batch, though with empty already_imported)
         assert mock_reconcile.call_count == 2
+
+
+def test_classify_transactions_mixed():
+    up_txns = [{"id": "a"}, {"id": "b"}, {"id": "c"}]
+    actual_ids = {"a", "c"}
+    already, new = classify_transactions(up_txns, actual_ids)
+    assert already == [{"id": "a"}, {"id": "c"}]
+    assert new == [{"id": "b"}]
+
+
+def test_classify_transactions_all_existing():
+    up_txns = [{"id": "a"}, {"id": "b"}]
+    actual_ids = {"a", "b"}
+    already, new = classify_transactions(up_txns, actual_ids)
+    assert already == [{"id": "a"}, {"id": "b"}]
+    assert new == []
+
+
+def test_classify_transactions_all_new():
+    up_txns = [{"id": "x"}, {"id": "y"}]
+    actual_ids = {"a", "b"}
+    already, new = classify_transactions(up_txns, actual_ids)
+    assert already == []
+    assert new == [{"id": "x"}, {"id": "y"}]
+
+
+def test_classify_transactions_empty():
+    already, new = classify_transactions([], {"a"})
+    assert already == []
+    assert new == []
+
+
+@patch("up.transactions.create_transactions")
+@patch("up.transactions.reconcile_transactions")
+@patch("up.transactions.get_transactions")
+def test_process_batch_splits_and_dispatches(
+    mock_get_txns: MagicMock, mock_reconcile: MagicMock, mock_create: MagicMock
+):
+    mock_actual_txn = MagicMock()
+    mock_actual_txn.financial_id = "existing-1"
+    mock_get_txns.return_value = [mock_actual_txn]
+
+    up_transactions = [{"id": "existing-1"}, {"id": "new-1"}]
+    session = MagicMock()
+    start_date = datetime(2025, 1, 1)
+
+    process_batch(session, "Spending", up_transactions, start_date)
+
+    mock_get_txns.assert_called_once_with(session, account="Spending", start_date=start_date)
+    mock_reconcile.assert_called_once_with(
+        session=session,
+        account_name="Spending",
+        transactions=[{"id": "existing-1"}],
+        already_imported_transactions=[{"id": "existing-1"}],
+    )
+    mock_create.assert_called_once_with(session=session, account_name="Spending", transactions=[{"id": "new-1"}])
+
+
+@patch("up.transactions.create_transactions")
+@patch("up.transactions.reconcile_transactions")
+@patch("up.transactions.get_transactions")
+def test_process_batch_all_new(mock_get_txns: MagicMock, mock_reconcile: MagicMock, mock_create: MagicMock):
+    mock_get_txns.return_value = []
+
+    up_transactions = [{"id": "new-1"}, {"id": "new-2"}]
+    session = MagicMock()
+
+    process_batch(session, "Spending", up_transactions, datetime(2025, 1, 1))
+
+    mock_reconcile.assert_called_once_with(
+        session=session,
+        account_name="Spending",
+        transactions=[],
+        already_imported_transactions=[],
+    )
+    mock_create.assert_called_once_with(
+        session=session, account_name="Spending", transactions=[{"id": "new-1"}, {"id": "new-2"}]
+    )
+
+
+@patch("up.transactions.create_transactions")
+@patch("up.transactions.reconcile_transactions")
+@patch("up.transactions.get_transactions")
+def test_process_batch_all_existing(mock_get_txns: MagicMock, mock_reconcile: MagicMock, mock_create: MagicMock):
+    mock_actual_1 = MagicMock()
+    mock_actual_1.financial_id = "a"
+    mock_actual_2 = MagicMock()
+    mock_actual_2.financial_id = "b"
+    mock_get_txns.return_value = [mock_actual_1, mock_actual_2]
+
+    up_transactions = [{"id": "a"}, {"id": "b"}]
+    session = MagicMock()
+
+    process_batch(session, "Spending", up_transactions, datetime(2025, 1, 1))
+
+    mock_reconcile.assert_called_once_with(
+        session=session,
+        account_name="Spending",
+        transactions=[{"id": "a"}, {"id": "b"}],
+        already_imported_transactions=[{"id": "a"}, {"id": "b"}],
+    )
+    mock_create.assert_called_once_with(session=session, account_name="Spending", transactions=[])
