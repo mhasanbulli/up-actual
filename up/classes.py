@@ -157,7 +157,6 @@ class SimplifiedCategories(Enum):
             Categories.EVENTS_GIGS,
             Categories.BOOZE,
             Categories.HOBBIES,
-            Categories.HOLIDAYS_TRAVEL,
             Categories.LOTTERY_GAMBLING,
             Categories.NEWS_MAGAZINES_BOOKS,
         },
@@ -233,6 +232,12 @@ class SimplifiedCategories(Enum):
         "Technology",
         {
             Categories.TECHNOLOGY,
+        },
+    )
+    HOLIDAY = (
+        "Holiday",
+        {
+            Categories.HOLIDAYS_TRAVEL,
         },
     )
 
