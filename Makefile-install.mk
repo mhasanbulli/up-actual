@@ -1,7 +1,7 @@
 MAKEFLAGS += --warn-undefined-variables --check-symlink-times
 SHELL = /bin/bash -o pipefail
 .DEFAULT_GOAL := help
-.PHONY: help clean install format check pyright test hooks install-hooks
+.PHONY: help clean install format check ty test hooks install-hooks
 PYTHONPATH=$(shell pwd)
 
 ## display help message

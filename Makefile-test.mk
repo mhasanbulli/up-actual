@@ -3,12 +3,12 @@ check: export SKIP=test
 check: hooks
 
 ## format and lint
-format: export SKIP=pyright,test
+format: export SKIP=ty,test
 format: hooks
 
-## pyright type check
-pyright:
-	uv run pyright
+## type check
+tv:
+	uv run ty check
 
 ## run tests
 test:
