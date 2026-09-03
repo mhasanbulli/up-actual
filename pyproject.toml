@@ -5,12 +5,13 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "actualpy==0.21",
+    "actualpy~=0.22",
     "jsonschema~=4.0",
     "pydantic~=2.0",
     "pydantic-settings~=2.0",
-    "pytz~=2025.0",
-    "structlog~=25.0",
+    "pytz~=2026.3",
+    "requests~=2.34",
+    "structlog~=26.0",
     "typer~=0.20",
     "ujson~=5.0",
 ]
