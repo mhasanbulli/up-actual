@@ -10,7 +10,7 @@ runner = CliRunner()
 
 
 def test_get_settings(mock_actual_env_vars: pytest.MonkeyPatch):  # noqa: ARG001
-    settings = Settings()  # type: ignore
+    settings = Settings()
 
     assert settings.url.get_secret_value() == "https://actual.com"
     assert settings.password.get_secret_value() == "password"

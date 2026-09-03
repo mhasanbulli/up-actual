@@ -85,7 +85,7 @@ def reconcile(
         logger.info(f"Syncing transactions from the last {days_back} days")
 
     query_params = QueryParams(start_date=parsed_date, days_offset=0, page_size=page_size)
-    actual_settings = Settings()  # type: ignore
+    actual_settings = Settings()
 
     actual_init = ActualSession(
         url=actual_settings.url.get_secret_value(),
