@@ -70,19 +70,21 @@ def test_get_transactions_batch():
 def test_reconcile_transactions():
     mock_session = MagicMock()
     mock_rule_set = MagicMock()
-    mock_transaction = {
-        "id": "txn1",
-        "attributes": {
-            "createdAt": "2025-06-10T12:00:00Z",
-            "description": "Test Payee",
-            "rawText": "Raw Payee",
-            "message": "Test Message",
-            "amount": {"value": "100.00"},
-            "roundUp": None,
-            "status": "SETTLED",
-        },
-        "relationships": {"category": {"data": {"id": "groceries"}}},
-    }
+    mock_transactions = [
+        {
+            "id": "txn1",
+            "attributes": {
+                "createdAt": "2025-06-10T12:00:00Z",
+                "description": "Test Payee",
+                "rawText": "Raw Payee",
+                "message": "Test Message",
+                "amount": {"value": "100.00"},
+                "roundUp": None,
+                "status": "SETTLED",
+            },
+            "relationships": {"category": {"data": {"id": "groceries"}}},
+        }
+    ]
     with (
         patch("up.transactions.get_ruleset", return_value=mock_rule_set),
         patch("up.transactions.reconcile_transaction", return_value="reconciled_txn") as mock_reconcile,
@@ -90,7 +92,7 @@ def test_reconcile_transactions():
         reconcile_transactions(
             session=mock_session,
             account_name="Test Account",
-            transactions=[mock_transaction],
+            transactions=mock_transactions,
             already_imported_transactions=[],
         )
         mock_reconcile.assert_called_once()
@@ -100,19 +102,21 @@ def test_reconcile_transactions():
 def test_create_transactions():
     mock_session = MagicMock()
     mock_rule_set = MagicMock()
-    mock_transaction = {
-        "id": "txn2",
-        "attributes": {
-            "createdAt": "2025-06-10T12:00:00Z",
-            "description": "Test Payee",
-            "rawText": "Raw Payee",
-            "message": "Test Message",
-            "amount": {"value": "50.00"},
-            "roundUp": {"amount": {"value": "5.00"}},
-            "status": "SETTLED",
-        },
-        "relationships": {"category": {"data": {"id": "booze"}}},
-    }
+    mock_transactions = [
+        {
+            "id": "txn2",
+            "attributes": {
+                "createdAt": "2025-06-10T12:00:00Z",
+                "description": "Test Payee",
+                "rawText": "Raw Payee",
+                "message": "Test Message",
+                "amount": {"value": "50.00"},
+                "roundUp": {"amount": {"value": "5.00"}},
+                "status": "SETTLED",
+            },
+            "relationships": {"category": {"data": {"id": "booze"}}},
+        }
+    ]
     with (
         patch("up.transactions.get_ruleset", return_value=mock_rule_set),
         patch("up.transactions.create_transaction", return_value="created_txn") as mock_create,
@@ -120,7 +124,7 @@ def test_create_transactions():
         create_transactions(
             session=mock_session,
             account_name="Test Account",
-            transactions=[mock_transaction],
+            transactions=mock_transactions,
         )
         mock_create.assert_called_once()
         mock_rule_set.run.assert_called_once_with("created_txn")
@@ -490,5 +494,41 @@ def test_process_batch_all_existing(mock_get_txns: MagicMock, mock_reconcile: Ma
         account_name="Spending",
         transactions=[{"id": "a"}, {"id": "b"}],
         already_imported_transactions=[{"id": "a"}, {"id": "b"}],
+    )
+    mock_create.assert_called_once_with(session=session, account_name="Spending", transactions=[])
+
+
+@patch("up.transactions.create_transactions")
+@patch("up.transactions.reconcile_transactions")
+@patch("up.transactions.get_transactions")
+def test_process_batch_exclude_myki(mock_get_txns: MagicMock, mock_reconcile: MagicMock, mock_create: MagicMock):
+    mock_actual = MagicMock()
+    mock_actual.financial_id = "a"
+    mock_get_txns.return_value = [mock_actual]
+
+    up_transactions = [
+        {
+            "id": "a",
+            "attributes": {
+                "createdAt": "2025-06-10T12:00:00Z",
+                "description": "Myki",
+                "rawText": "Raw Payee",
+                "message": "Test Message",
+                "amount": {"value": "-1.00"},
+                "roundUp": None,
+                "status": "HELD",
+            },
+            "relationships": {"category": {"data": {"id": "transport"}}},
+        }
+    ]
+    session = MagicMock()
+
+    process_batch(session, "Spending", up_transactions, datetime(2025, 1, 1))
+
+    mock_reconcile.assert_called_once_with(
+        session=session,
+        account_name="Spending",
+        transactions=[],
+        already_imported_transactions=[],
     )
     mock_create.assert_called_once_with(session=session, account_name="Spending", transactions=[])
