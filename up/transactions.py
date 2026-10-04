@@ -138,7 +138,20 @@ def process_batch(session: Session, account_name: str, up_transactions: list, st
         transaction.financial_id for transaction in transactions_from_actual if transaction.financial_id
     }
 
-    already_imported, new = classify_transactions(up_transactions, actual_financial_ids)
+    # This should filter out card check transactions that gets deleted after a couple of days.
+    # For now, this happens with only Myki. If other's starts to do this, we will need to find
+    # a better way to do this.
+    filtered_up_transactions = [
+        transaction
+        for transaction in up_transactions
+        if not (
+            (transaction.get("attributes") or {}).get("status") == "HELD"
+            and (transaction.get("attributes") or {}).get("description") == "Myki"
+            and ((transaction.get("attributes") or {}).get("amount") or {}).get("value") == "-1.00"
+        )
+    ]
+
+    already_imported, new = classify_transactions(filtered_up_transactions, actual_financial_ids)
 
     reconcile_transactions(
         session=session,

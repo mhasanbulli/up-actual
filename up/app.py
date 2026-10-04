@@ -67,7 +67,7 @@ def reconcile(
         # Sync transactions from a specific date
         $ up-actual reconcile --start-date 2025-01-01
 
-        # Customize the page size
+        # Customise the page size
         $ up-actual reconcile --page-size 50
     """
     up_api = UpAPI()
