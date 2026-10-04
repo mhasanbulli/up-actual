@@ -21,20 +21,11 @@ def test_get_settings(mock_actual_env_vars: pytest.MonkeyPatch):  # noqa: ARG001
 @patch("up.app.reconcile_accounts")
 @patch("up.app.get_account_transaction_urls")
 @patch("up.app.ActualSession")
-@patch("up.app.Settings")
-@patch("up.app.UpAPI")
 def test_reconcile_command_default_parameters(
-    mock_up_api: MagicMock,  # noqa: ARG001
-    mock_settings: MagicMock,
     mock_actual_session: MagicMock,
     mock_get_accounts: MagicMock,
     mock_reconcile: MagicMock,
 ):
-    mock_settings.return_value.url.get_secret_value.return_value = "https://actual.com"
-    mock_settings.return_value.password.get_secret_value.return_value = "password"
-    mock_settings.return_value.encryption_password.get_secret_value.return_value = "enc_password"
-    mock_settings.return_value.file = "test_file"
-
     mock_actual_instance = MagicMock()
     mock_actual_session.return_value.get_actual_session.return_value = mock_actual_instance
 
@@ -54,20 +45,11 @@ def test_reconcile_command_default_parameters(
 @patch("up.app.reconcile_accounts")
 @patch("up.app.get_account_transaction_urls")
 @patch("up.app.ActualSession")
-@patch("up.app.Settings")
-@patch("up.app.UpAPI")
 def test_reconcile_command_with_start_date(
-    mock_up_api: MagicMock,  # noqa: ARG001
-    mock_settings: MagicMock,
     mock_actual_session: MagicMock,
     mock_get_accounts: MagicMock,
     mock_reconcile: MagicMock,
 ):
-    mock_settings.return_value.url.get_secret_value.return_value = "https://actual.com"
-    mock_settings.return_value.password.get_secret_value.return_value = "password"
-    mock_settings.return_value.encryption_password.get_secret_value.return_value = "enc_password"
-    mock_settings.return_value.file = "test_file"
-
     mock_actual_instance = MagicMock()
     mock_actual_session.return_value.get_actual_session.return_value = mock_actual_instance
 
@@ -86,20 +68,11 @@ def test_reconcile_command_with_start_date(
 @patch("up.app.reconcile_accounts")
 @patch("up.app.get_account_transaction_urls")
 @patch("up.app.ActualSession")
-@patch("up.app.Settings")
-@patch("up.app.UpAPI")
 def test_reconcile_command_with_days_back(
-    mock_up_api: MagicMock,  # noqa: ARG001
-    mock_settings: MagicMock,
     mock_actual_session: MagicMock,
     mock_get_accounts: MagicMock,
     mock_reconcile: MagicMock,
 ):
-    mock_settings.return_value.url.get_secret_value.return_value = "https://actual.com"
-    mock_settings.return_value.password.get_secret_value.return_value = "password"
-    mock_settings.return_value.encryption_password.get_secret_value.return_value = "enc_password"
-    mock_settings.return_value.file = "test_file"
-
     mock_actual_instance = MagicMock()
     mock_actual_session.return_value.get_actual_session.return_value = mock_actual_instance
 
@@ -114,20 +87,11 @@ def test_reconcile_command_with_days_back(
 @patch("up.app.reconcile_accounts")
 @patch("up.app.get_account_transaction_urls")
 @patch("up.app.ActualSession")
-@patch("up.app.Settings")
-@patch("up.app.UpAPI")
 def test_reconcile_command_with_page_size(
-    mock_up_api: MagicMock,  # noqa: ARG001
-    mock_settings: MagicMock,
     mock_actual_session: MagicMock,
     mock_get_accounts: MagicMock,
     mock_reconcile: MagicMock,
 ):
-    mock_settings.return_value.url.get_secret_value.return_value = "https://actual.com"
-    mock_settings.return_value.password.get_secret_value.return_value = "password"
-    mock_settings.return_value.encryption_password.get_secret_value.return_value = "enc_password"
-    mock_settings.return_value.file = "test_file"
-
     mock_actual_instance = MagicMock()
     mock_actual_session.return_value.get_actual_session.return_value = mock_actual_instance
 
