@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def mock_actual_env_vars(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("ACTUAL__URL", "https://actual.com")
     monkeypatch.setenv("ACTUAL__PASSWORD", "password")
