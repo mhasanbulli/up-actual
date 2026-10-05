@@ -165,23 +165,19 @@ def process_batch(session: Session, account_name: str, up_transactions: list, st
 def reconcile_accounts(
     accounts: list[UpAccount], up_api: UpAPI, actual_session: Actual, query_params: QueryParams
 ) -> None:
-    for up_account in accounts:
-        batch = get_transactions_batch(
-            up_api=up_api, query_params=query_params, account_name=up_account.name, url=up_account.url
-        )
+    with actual_session as a:
+        for up_account in accounts:
+            url = up_account.url
+            params = query_params
 
-        if not batch.transactions:
-            continue
-
-        with actual_session as a:
-            process_batch(a.session, batch.account_name, batch.transactions, query_params.start_date)
-            a.commit()
-
-            next_url = batch.next_url
-            while next_url:
+            while url:
                 batch = get_transactions_batch(
-                    up_api=up_api, query_params=None, account_name=up_account.name, url=next_url
+                    up_api=up_api, query_params=params, account_name=up_account.name, url=up_account.url
                 )
-                process_batch(a.session, batch.account_name, batch.transactions, query_params.start_date)
-                a.commit()
-                next_url = batch.next_url
+
+                if batch.transactions:
+                    process_batch(a.session, batch.account_name, batch.transactions, query_params.start_date)
+                    a.commit()
+
+                    url = batch.next_url
+                    params = None
