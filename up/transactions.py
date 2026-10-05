@@ -175,9 +175,11 @@ def reconcile_accounts(
                     up_api=up_api, query_params=params, account_name=up_account.name, url=up_account.url
                 )
 
-                if batch.transactions:
-                    process_batch(a.session, batch.account_name, batch.transactions, query_params.start_date)
-                    a.commit()
+                if not batch.transactions:
+                    break
 
-                    url = batch.next_url
-                    params = None
+                process_batch(a.session, batch.account_name, batch.transactions, query_params.start_date)
+                a.commit()
+
+                url = batch.next_url
+                params = None
