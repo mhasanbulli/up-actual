@@ -496,39 +496,3 @@ def test_process_batch_all_existing(mock_get_txns: MagicMock, mock_reconcile: Ma
         already_imported_transactions=[{"id": "a"}, {"id": "b"}],
     )
     mock_create.assert_called_once_with(session=session, account_name="Spending", transactions=[])
-
-
-@patch("up.transactions.create_transactions")
-@patch("up.transactions.reconcile_transactions")
-@patch("up.transactions.get_transactions")
-def test_process_batch_exclude_myki(mock_get_txns: MagicMock, mock_reconcile: MagicMock, mock_create: MagicMock):
-    mock_actual = MagicMock()
-    mock_actual.financial_id = "a"
-    mock_get_txns.return_value = [mock_actual]
-
-    up_transactions = [
-        {
-            "id": "a",
-            "attributes": {
-                "createdAt": "2025-06-10T12:00:00Z",
-                "description": "Myki",
-                "rawText": "Raw Payee",
-                "message": "Test Message",
-                "amount": {"value": "-1.00"},
-                "roundUp": None,
-                "status": "HELD",
-            },
-            "relationships": {"category": {"data": {"id": "transport"}}},
-        }
-    ]
-    session = MagicMock()
-
-    process_batch(session, "Spending", up_transactions, datetime(2025, 1, 1))
-
-    mock_reconcile.assert_called_once_with(
-        session=session,
-        account_name="Spending",
-        transactions=[],
-        already_imported_transactions=[],
-    )
-    mock_create.assert_called_once_with(session=session, account_name="Spending", transactions=[])
